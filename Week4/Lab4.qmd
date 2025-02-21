@@ -1,0 +1,291 @@
+---
+title: "CMPU4091 Visualising Data"
+subtitle: "Correlation"
+author: "Matthew Bradon C21380786"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+    css: "./styles.css"
+editor: visual
+---
+
+```{r setup, include="FALSE"}
+
+#Setting include to FALSE on this chunk so that it doesn't appear in the output
+# Load necessary libraries
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+if (!require("tidyverse")) install.packages("tidyverse", dependencies = TRUE)
+if (!require("cowplot")) install.packages("cowplot", dependencies = TRUE)
+if (!require("plotly")) install.packages("plotly", dependencies = TRUE)
+if (!require("ggcorrplot")) install.packages("ggcorrplot", dependencies = TRUE)
+if (!require("pastecs")) install.packages("pastecs", dependencies = TRUE)
+if (!require("PerformanceAnalytics")) install.packages("PerformanceAnalytics", dependencies = TRUE)
+if (!require("patchwork")) install.packages("patchwork", dependencies = TRUE)
+if (!require("Hmisc")) install.packages("Hmisc", dependencies = TRUE)
+if (!require("corrplot")) install.packages("corrplot", dependencies = TRUE)
+if(!require("mgcv")) install.packages("mgcv", dependencies = TRUE)
+
+
+library(tidyverse) # Tools for wrangling data
+library(cowplot) # For organising plots into a grid
+library(patchwork) # For matrix layout
+library(plotly) # For Animating plots
+library(ggcorrplot) # For Correlation Heatmaps 
+library(corrplot) # For correlation matrices
+library(PerformanceAnalytics)# For standardised skewness and kurtosis
+library(Hmisc) # For generating correlation
+
+
+#We are using a file created from the SPSS file survey.sav  taken from SPSS Survival Manual 6th Edition Julie Pallant (http://spss.allenandunwin.com.s3-website-ap-southeast-2.amazonaws.com/data-files.html#.Wb0vvnWP-po). 
+#This has been saved to a .dat format - more easily readable in R.
+
+# Load dataset - format the location using file.path to ensure it will locate it correctly
+mydata <- file.path("C:/Users/Matt/Desktop/VisualizingDataRModule/Week4")
+datapath <- file.path(mydata,'survey.dat')
+
+#Load it into the dataframe called survey (.dat file so use read.Table)
+survey <- read.table(datapath)
+
+#Setting the column names to be that used in the dataset but in lowercase to make life a bit easier
+colnames(survey) <- tolower(colnames(survey))
+
+survey <- na.omit(survey)
+```
+
+
+<p>
+# Summarise the data
+summary(survey)
+
+str(survey)
+
+</p>
+
+# Histograms with Density Plots
+```{r}
+# Optimism Histogram
+toptim_hist <- ggplot(survey, aes(x = toptim)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha = 0.4, position = "identity", fill = "red") +
+  geom_density(alpha = 0.7, adjust = 1.2) +
+  labs(title = "Optimism", x = "Optimism", y = "Density") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+# Positive Affect Histogram
+tposaff_hist <- ggplot(survey, aes(x = tposaff)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha = 0.4, position = "identity", fill = "blue") +
+  geom_density(alpha = 0.7, adjust = 1.2) +
+  labs(title = "Positive Affect", x = "Positive Affect", y = "Density") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+# Negative Affect Histogram
+tnegaff_hist <- ggplot(survey, aes(x = tnegaff)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha = 0.4, position = "identity", fill = "darkgreen") +
+  geom_density(alpha = 0.7, adjust = 1.2) +
+  labs(title = "Negative Affect", x = "Negative Affect", y = "Density") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+# Mastery Histogram
+tmast_hist <- ggplot(survey, aes(x = tmast)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, alpha = 0.4, position = "identity", fill = "purple") +
+  geom_density(alpha = 0.7, adjust = 1.2) +
+  labs(title = "Mastery", x = "Mastery", y = "Density") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+# Arrange the plots using cowplot
+histogram_grid <- plot_grid(toptim_hist, tposaff_hist, tnegaff_hist, tmast_hist, nrow = 2, ncol = 2)
+
+# Display the grid
+histogram_grid
+```
+
+<p>
+Optimism, Postive affect and Mastery are left skewed and Negative Affect is right skewed.
+
+</p>
+
+
+# Smoking Status Bar Chart
+
+```{r}
+smoke_bar <- ggplot(survey, aes(x = smoke, fill = as.factor(smoke))) +  # Color by category
+  geom_bar() +
+  labs(title = "Bar Chart of Smoking Status", x = "Smoking Status", y = "Count", fill = "Smoking Status") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+smoke_bar
+```
+
+<p>
+There is a major class imbalance of non smoker to smokers is this a possible source of the skewness we observe above.
+</p>
+
+# Box plot Comparing optimism between smokers and non smokers
+```{R}
+# Box plot Comparing optimism between smokers and non smokers
+smoke_box <- ggplot(survey, aes(x = smoke, y = toptim, fill = smoke)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Optimism by Smoking Status", x = "Smoking Status", y = "Optimism", fill = "Smoking Status") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 10, face = "bold"),
+    axis.title = element_text(size = 9),
+    axis.text = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(5, 10, 5, 5)
+  )
+
+smoke_box
+```
+
+<p>
+The 3rd quartile of people who dont smoke is higher but the median of smoker is higher than non smokers. The 1st quartile of smokers is lower than that of non smokers
+
+The minimum and maximum of both classes are around the same
+
+In non smokers there are two outliers who are really low on optimism.
+
+We do have significantly less examples of smokers than non smokers if our dataset was larger there might have been a bigger difference in the box plots.
+</p>
+# Exploring Relaitonships
+## Correlation coefficients and p-values
+<p>The correlation between Total optimism and positive affect, negative affect and mastery</p>
+```{r}
+for (var in c("tposaff", "tnegaff", "tmast")) {
+  var_data <- survey %>% select(toptim, !!sym(var)) %>% 
+    rename(
+      Optimism = toptim,
+      Variable = !!sym(var)
+    )
+  
+  if (nrow(var_data) > 1) {
+    cor_result <- cor.test(var_data$Optimism, var_data$Variable)
+    cat(paste("\nVariable:", var, "\n"))
+    print(data.frame(
+      Variable = var,
+      Correlation = cor_result$estimate,
+      P_value = cor_result$p.value
+    ))
+  }
+}
+```
+
+<p>
+Each of the correlations are moderate i.e 0.3 to 0.6
+
+Mastery has the highest correlation with Optimism at 0.569.
+
+All of the correlations for the psychological factors all have a P value < 0.05 making it seem to be statically significant enough to rule out random chance.
+</p>
+
+## Scatterplot with linear regression
+```{r}
+create_scatterplots_toptim <- function(data, title) {
+  p1 <- ggplot(data, aes(x = tposaff, y = toptim)) +
+    geom_point(alpha = 0.5, color = "blue") +
+    geom_smooth(method = "lm", color = "red", se = TRUE) +
+    labs(title = "Optimism vs. Positive Affect", x = "Positive Affect", y = "Optimism") +
+    theme_minimal()
+
+  p2 <- ggplot(data, aes(x = tnegaff, y = toptim)) +
+    geom_point(alpha = 0.5, color = "green") +
+    geom_smooth(method = "lm", color = "red", se = TRUE) +
+    labs(title = "Optimism vs. Negative Affect", x = "Negative Affect", y = "Optimism") +
+    theme_minimal()
+
+  p3 <- ggplot(data, aes(x = tmast, y = toptim)) +
+    geom_point(alpha = 0.5, color = "purple") +
+    geom_smooth(method = "lm", color = "red", se = TRUE) +
+    labs(title = "Optimism vs. Mastery", x = "Mastery", y = "Optimism") +
+    theme_minimal()
+
+  # Combine plots using patchwork
+  (p1 / p2 / p3) + 
+    patchwork::plot_annotation(title = title, theme = theme(plot.title = element_text(hjust = 0.5)))
+}
+
+# Call the function with the dataset
+scatter_plots <- create_scatterplots_toptim(survey, "Scatterplots of Optimism and Psychological Factors")
+print(scatter_plots)
+
+```
+
+<p>
+Positive affect has a a moderate positive correlation with Optimism meaning that happier people tend to be more optimistic
+
+Mastery has a moderate positive correlation with Optimism meaning those who feel in control tend to be more optimistic
+
+Negative Affect hasa moderate negative correlation meaning that more negative emotions tend to lower your optimism
+</p>
+
+## Correlation Heatmap
+```{r}
+# Function to create a heatmap
+create_heatmap <- function(data, title) {
+  # Select only relevant columns
+  selected_data <- data %>% select(toptim, tposaff, tnegaff, tmast)
+
+  # Compute correlation matrix
+  corr_matrix <- cor(selected_data, use = "complete.obs")
+
+  # Generate heatmap
+  p <- ggcorrplot(corr_matrix, 
+                  type = "lower", 
+                  lab = TRUE, 
+                  lab_size = 3, 
+                  colors = c("#6D9EC1", "white", "#E46726"), 
+                  title = title, 
+                  ggtheme = theme_minimal()) +
+    theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"))
+
+  return(p)  # Ensure function returns the plot
+}
+
+# Generate and display the heatmap
+heatmap <- create_heatmap(survey, "Correlation Heatmap of Psychological Factors")
+print(heatmap)
+
+```
+
+<p>
+Blue squres are negative correlation and Red squares are positive correlation
+
+I.e Positive Affect and Negative Affect have moderate negative correlation as happier people tend to have less negative thoughts.
+
+People who are more in control tend to be happier and optimistic
+</p>

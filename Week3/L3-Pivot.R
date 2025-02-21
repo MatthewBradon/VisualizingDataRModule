@@ -11,7 +11,8 @@ if (!require("janitor")) install.packages("janitor", dependencies = TRUE)
 library(tidyverse)
 
 # Set up the location of your data file
-mydata = file.path("/Users/xsmoked/Desktop/College/Sem2/VisualizingData/Week3/")
+mydata = file.path("C:/Users/Matt/Desktop/VisualizingDataRModule/Week3")
+# mydata = file.path("/Users/xsmoked/Desktop/College/Sem2/VisualizingData/Week3/")
 
 
 #SECTION ONE: Wide to Long

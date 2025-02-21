@@ -9,7 +9,8 @@ library(tidyverse)
 library(cowplot)
 
 # Load dataset - format the location using file.path to ensure it will locate it correctly
-mydata <- file.path("/Users/xsmoked/Desktop/College/Sem2/VisualizingData/Week3/")
+# mydata <- file.path("/Users/xsmoked/Desktop/College/Sem2/VisualizingData/Week3/")
+mydata = file.path("C:/Users/Matt/Desktop/VisualizingDataRModule/Week3")
 datapath <- file.path(mydata,'Olympics.csv')
 df <- read.csv(datapath)
 

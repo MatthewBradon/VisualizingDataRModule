@@ -1,0 +1,8 @@
+/* Center figure captions */
+figcaption {
+    text-align: center;
+    font-style: italic;
+}
+body {
+  text-align: justify;
+}
