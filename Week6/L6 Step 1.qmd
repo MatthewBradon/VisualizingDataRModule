@@ -1,0 +1,16 @@
+---
+title: "A Simple dashboard"
+format: 
+  dashboard:
+    orientation: rows
+---
+
+```{r}
+library(gapminder)
+```
+
+
+
+```{r}
+plot(gapminder)
+```

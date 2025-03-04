@@ -1,0 +1,52 @@
+---
+title: "A Simple dashboard"
+format: 
+  dashboard:
+    orientation: rows
+    self-contained: true
+---
+Welcome to the First Interactive Dashboard.
+
+::: { .valuebox color=red}
+*** Last Updated: *** `r Sys.Date()`
+:::
+
+```{r}
+library(gapminder)
+```
+# Page 1
+
+::: {.card}
+This is a dashboard which explores the gapminder dataset
+:::
+
+::: {.card title="Plot 1"}
+```{r}
+#| label: fig-gapminder-plot
+#| fig-width: 4
+#| fig-height: 5
+#| echo: false
+
+library(ggplot2)
+
+ggplot(gapminder, aes(x = year, y = lifeExp, color = continent)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  theme_minimal()
+```
+This is a plot of the Gapminder dataset, showing life expectancy trends over time.
+:::
+
+
+::: {.card title="Plot 2"}
+```{r}
+plot(gapminder$lifeExp)
+```
+:::
+
+# Page 2
+## Row
+```{r}
+#| title: "Plot 3"
+plot(gapminder$gdpPercap)
+```

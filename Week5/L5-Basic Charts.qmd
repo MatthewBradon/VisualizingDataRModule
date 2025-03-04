@@ -1,0 +1,439 @@
+---
+title: "CMPU4091 Visualizing Data"
+sub-title: "L5 - Visualizing Time Trend (Bar Charts and Line Charts)"
+format:
+  html:
+    code-fold: true
+    self-contained: true
+    toc: true
+editor: visual
+---
+
+```{r setup-libraries}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+# Install & Load Packages Silently
+quiet_library("ggplot2")
+quiet_library("plotly")
+quiet_library("gapminder") #An excerpt of the data available at Gapminder.org. For each of 142 countries, the package provides values for life expectancy, GDP per capita, and population, every five years, from 1952 to 2007.
+quiet_library("tidyverse")
+quiet_library("ggstream") #For Stream graphs
+quiet_library("fmsb")  # For radar chart
+quiet_library("GGally")  # For parallel co-ordinates chart
+
+```
+
+# 1. Time Trends
+
+## 1.1 Bar Charts
+
+### 1.1.1 Simple Time Bar Chart
+
+```{r simplebar}
+p_bar <- gapminder %>%
+  group_by(year, continent) %>%
+  summarize(lifeExp = mean(lifeExp), .groups = "drop") %>%  # Aggregate life expectancy
+  ggplot(aes(x = factor(year), y = lifeExp, fill = continent)) +  # Convert year to factor for discrete bars
+  geom_col(position = "dodge") +  # Use geom_col() for summarized data
+  labs(title = "Average Life Expectancy Over Time by Continent",
+       x = "Year",
+       y = "Life Expectancy",
+       fill = "Continent") +
+  theme_bw()
+
+p_bar
+```
+
+### 1.1.2 Interactive Simple Time Bar Chart (using ggplotly)
+
+```{r simplebarinter}
+#Making it interactive (check the hover text, and click on the legend to add/remove bars)
+ggplotly(p_bar)
+```
+
+### 1.1.3 Divergent Bar Chart
+
+```{r divergebar}
+# Divergent bar chart
+p_bar_divergent <- gapminder %>%
+  group_by(year) %>%
+  mutate(global_avg = mean(lifeExp)) %>%  # Compute global average per year
+  ungroup() %>%
+  group_by(year, continent) %>%
+  summarize(lifeExp = mean(lifeExp), global_avg = unique(global_avg), .groups = "drop") %>%
+  mutate(deviation = lifeExp - global_avg) %>%  # Calculate deviation from the global average
+  ggplot(aes(x = factor(year), y = deviation, fill = continent)) +
+  geom_col(position = "dodge") +  # Dodge to show bars side by side
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed") +  # Add a baseline at 0
+  labs(title = "Divergent Bar Chart of Life Expectancy by Continent",
+       x = "Year",
+       y = "Deviation from Global Average Life Expectancy",
+       fill = "Continent") +
+  theme_bw()
+
+p_bar_divergent
+
+```
+
+### 1.1.4 Divergent Bar Chart Vertical Reference line
+
+```{r diverge-vertref}
+# Prepare data (USArrests is a baseline r dataset)
+state_crime <- USArrests %>%
+  mutate(State = rownames(USArrests)) %>%  # Convert row names to a column
+  mutate(Deviation = Murder - mean(Murder)) %>%  # Calculate deviation from national average
+  arrange(Deviation)  # Order by deviation for better visualization
+
+# Create Divergent Bar Chart
+#Shows States with higher-than-average murder rates (bars extending right, colored blue).
+#States with lower-than-average murder rates (bars extending left, colored red).
+#The vertical dashed line at 0 makes it easy to compare states.
+
+p <- ggplot(state_crime, aes(y = reorder(State, Deviation), x = Deviation, fill = Deviation > 0)) +
+  geom_col(width = 0.7, position = position_dodge(0.9)) + # Bar Chart set bar width and separation
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed") +  # Vertical reference line
+  scale_fill_manual(values = c("red", "blue"), guide = "none") +  # Color: Red = below avg, Blue = above avg
+  labs(title = "Deviation of Murder Rate from National Average (US States)",
+       x = "Deviation from National Average",
+       y = "State") +
+  theme_minimal()
+
+```
+
+### 1.1.5 Interactive Divergent Bar Chart (with Defined Tooltips ggplotly)
+
+```{r diverge-vertrefinter}
+# Interactive Chart
+
+# Add tool tips
+# Create ggplot with tooltips
+p <- ggplot(state_crime, aes(y = reorder(State, Deviation), x = Deviation, fill = Deviation > 0, 
+                             text = paste0("State: ", State, "<br>",
+                                           "Deviation: ", round(Deviation, 2), "<br>",
+                                           "Murder Rate: ", round(Murder, 2)))) + 
+  geom_col(width = 0.7, position = position_dodge(0.9)) +  # Set bar width and separation
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed") +  # Vertical reference line
+  scale_fill_manual(values = c("red", "blue"), guide = "none") +  # Color: Red = below avg, Blue = above avg
+  labs(title = "Deviation of Murder Rate from National Average (US States) with tooltips",
+       x = "Deviation from National Average",
+       y = "State") +
+  theme_minimal()
+
+
+# Convert to interactive plot with tooltips
+ggplotly(p, tooltip = "text")
+
+```
+
+## 1.2 Line Charts
+
+### 1.2.1 Single Line Time Trend
+
+```{r trend-single}
+# Single Time Trend - Life Expectancy in the United States
+p_single <- ggplot(gapminder %>% filter(country == "United States"), aes(x = year, y = lifeExp)) +
+  geom_line() +
+  labs(title = "Life Expectancy in the United States", x = "Year", y = "Life Expectancy")
+ggplotly(p_single)
+```
+
+### 1.2.2 Time Trend Faceted
+
+```{r trend-faceted}
+# Faceting (Life expectancy by continent)
+p_faceted <- gapminder %>%
+  ggplot(aes(x = year, y = lifeExp, color = continent)) +
+  geom_line() +
+  facet_wrap(~ continent, ncol = 3) +  # Facet by continent, 3 columns
+  labs(title = "Life Expectancy Over Time by Continent", x = "Year", y = "Life Expectancy", color = "Continent") +
+  theme_bw()
+
+ggplotly(p_faceted)
+```
+
+### 1.2.3 Interactive Step Chart (using ggplotly)
+
+```{r stepchart}
+# Filter data for the United States
+p_step <- ggplot(gapminder %>% filter(country == "United States"), aes(x = year, y = lifeExp)) +
+  geom_step(linewidth = 1, color = "blue") +  # Step chart for discrete changes
+  geom_point(size = 3, color = "red") +  # Highlight actual data points
+  labs(
+    title = "Step Chart: Life Expectancy in the United States",
+    x = "Year",
+    y = "Life Expectancy"
+  ) +
+  theme_minimal()
+
+# Convert to interactive Plotly chart
+ggplotly(p_step)
+
+
+```
+
+### 1.2.4 Multiple Line Chart
+
+```{r trend-multiple}
+# Get a list of European countries (filter from gapminder dataset where continent="Europe")
+
+european_countries <- unique(gapminder$country[gapminder$continent == "Europe"])
+
+# Multiple Time Trends (Life expectancy for European countries)
+p_multiple_europe <- gapminder %>%
+  filter(country %in% european_countries) %>%
+  ggplot(aes(x = year, y = lifeExp, color = country)) +
+  geom_line() +
+  scale_color_viridis_d(option = "plasma") +
+  labs(title = "Life Expectancy Over Time in European Countries", x = "Year", y = "Life Expectancy", color = "Country") +
+  theme_bw()
+#scale_color_viridis_d(option = "plasma") set the colours smoothly
+```
+
+### 1.2.5 Interactive Multiple Line Chart (ggplotly)
+
+```{r trend-multipleinter}
+# Make it interactive
+ggplotly(p_multiple_europe)
+
+```
+
+## 1.3 Area Charts
+
+### 1.3.1 Stacked Area Chart
+
+```{r}
+# Summarize population by year and continent
+gapminder_summary <- gapminder %>%
+  group_by(year, continent) %>%
+  summarize(population = sum(pop), .groups = "drop")  # Total population per continent per year
+
+# Create the stacked area chart
+areagraph <- ggplot(data = gapminder_summary, 
+                    aes(x = year, 
+                        y = population, 
+                        fill = continent, 
+                        group = continent, 
+                        text = paste("<b>Continent:</b> ", continent, 
+                                     "<br><b>Year:</b> ", year, 
+                                     "<br><b>Population:</b> ", scales::comma(population)))) +
+  geom_area(position = "stack", alpha = 0.8) +  # Stacked area chart
+  scale_fill_brewer(palette = "Set3") +  # Nice color palette
+  scale_y_continuous(labels = scales::comma) +  # Format population numbers
+  labs(
+    title = "Population Trends by Continent (1952-2007)",
+    x = "Year",
+    y = "Population",
+    fill = "Continent"
+  ) +
+  theme_minimal()
+
+# Convert to interactive Plotly chart
+ggplotly(areagraph, tooltip = "text")
+
+```
+
+### 1.3.2 Streamgraph
+
+```{r}
+# Aggregate population by year and continent
+gapminder_stream <- gapminder %>%
+  group_by(year, continent) %>%
+  summarise(pop = sum(pop), .groups = "drop")  # Sum population per continent per year
+
+# Create the streamgraph
+streamgraph <- ggplot(data = gapminder_stream, 
+                      aes(x = year, 
+                          y = pop, 
+                          fill = continent,  # Fill by continent for distinct regions
+                          group = continent, 
+                          text = paste("Continent: ", continent, 
+                                       "<br>Year: ", year, 
+                                       "<br>Population: ", format(pop, big.mark = ",")))) +  # Format population
+  geom_stream(type = "proportional", alpha = 0.8) +  # Proper streamgraph
+  scale_fill_brewer(palette = "Set3") +  # Nice color palette
+  scale_y_continuous(expand = c(0, 0)) +  # Remove extra space
+  labs(
+    title = "World Population Trends by Continent (1952-2007)",
+    x = "Year",
+    y = NULL,  # Streamgraphs don't need y-axis labels
+    fill = "Continent"
+  ) +
+  theme_minimal() + 
+  theme(axis.text.y = element_blank(),  # Remove y-axis text
+        axis.ticks.y = element_blank())
+
+# Convert to interactive Plotly chart
+ggplotly(streamgraph, tooltip = "text")
+```
+
+### 1.3.3 Streamgraph - Ridged
+
+```{r}
+# Create the streamgraph
+streamgraph <- ggplot(data = gapminder_stream, 
+                      aes(x = year, 
+                          y = pop, 
+                          fill = continent,  # Fill by continent for distinct regions
+                          group = continent, 
+                          text = paste("Continent: ", continent, 
+                                       "<br>Year: ", year, 
+                                       "<br>Population: ", format(pop, big.mark = ",")))) +  # Format population
+  geom_stream(type = "ridge", alpha = 0.8) +  # Proper streamgraph
+  scale_fill_brewer(palette = "Set3") +  # Nice color palette
+  scale_y_continuous(expand = c(0, 0)) +  # Remove extra space
+  labs(
+    title = "World Population Trends by Continent (1952-2007)",
+    x = "Year",
+    y = NULL,  # Streamgraphs don't need y-axis labels
+    fill = "Continent"
+  ) +
+  theme_minimal() + 
+  theme(axis.text.y = element_blank(),  # Remove y-axis text
+        axis.ticks.y = element_blank())
+
+# Convert to interactive Plotly chart
+ggplotly(streamgraph, tooltip = "text")
+```
+
+### 1.3.4 Radar chart
+
+```{r}
+
+# Filter gapminder data for 2007 and group by continent
+gapminder_radar <- gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarise(
+    lifeExp = mean(lifeExp),  # Average life expectancy
+    gdpPercap = mean(gdpPercap),  # Average GDP per capita
+    pop = mean(pop),  # Average population
+    .groups = "drop"
+  )
+
+# Normalize the values (Radar charts require similar scales)
+normalize <- function(x) (x - min(x)) / (max(x) - min(x))
+
+gapminder_radar[, 2:4] <- lapply(gapminder_radar[, 2:4], normalize)
+
+# Add max/min rows required for fmsb package
+radar_data <- rbind(
+  rep(1, ncol(gapminder_radar)-1),  # Max value (normalized)
+  rep(0, ncol(gapminder_radar)-1),  # Min value (normalized)
+  gapminder_radar[, -1]  # Actual data
+)
+
+# Set row names to continent names
+rownames(radar_data) <- c("Max", "Min", gapminder_radar$continent)
+
+# Plot the radar chart
+radarchart(radar_data, axistype = 1, 
+           pcol = c("red", "blue", "green", "purple", "orange"),  # Colors for each continent
+           pfcol = alpha(c("red", "blue", "green", "purple", "orange"), 0.4), 
+           plwd = 2, 
+           title = "Radar Chart: Life Expectancy, GDP per Capita, and Population (2007)")
+
+# Add legend
+legend("topright", legend = gapminder_radar$continent, 
+       col = c("red", "blue", "green", "purple", "orange"), 
+       pch = 16, bty = "n")
+
+
+```
+
+### 1.3.5 Circular Bar Chart
+
+```{r circularbar}
+
+# Prepare the data (normalize values)
+gapminder_circular <- gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarise(
+    lifeExp = mean(lifeExp),
+    gdpPercap = mean(gdpPercap),
+    pop = mean(pop),
+    .groups = "drop"
+  ) %>%
+  mutate(across(lifeExp:pop, ~ (. - min(.)) / (max(.) - min(.)))) %>%  # Normalize values
+  pivot_longer(cols = -continent, names_to = "Metric", values_to = "Value") %>%
+  arrange(Metric, desc(Value))  # Arrange for a better circular order
+
+# Set factor levels for better ordering
+gapminder_circular$continent <- factor(gapminder_circular$continent, levels = rev(unique(gapminder_circular$continent)))
+
+# Plot Circular Bar Chart
+ggplot(gapminder_circular, aes(x = continent, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity") +
+  coord_polar(start = 0) +  # Convert to circular layout
+  facet_wrap(~ Metric, ncol = 1) +  # Separate for each metric
+  theme_minimal() +
+  labs(title = "Circular Bar Chart: Life Expectancy, GDP, and Population (2007)",
+       x = "", y = "") +
+  theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+
+
+
+```
+
+### 1.3.6 Faceted bar chart
+
+```{r facetedbar}
+
+# Define normalization function
+normalize <- function(x) (x - min(x)) / (max(x) - min(x))
+
+gapminder_bar <- gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarise(
+    lifeExp = mean(lifeExp),
+    gdpPercap = mean(gdpPercap),
+    pop = mean(pop),
+    .groups = "drop"
+  ) %>%
+  mutate(across(lifeExp:pop, normalize)) %>%
+  pivot_longer(cols = -continent, names_to = "Metric", values_to = "Value")
+
+# Plot
+ggplot(gapminder_bar, aes(x = continent, y = Value, fill = continent)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Metric, scales = "free_y") +
+  labs(title = "Faceted Bar Charts: Life Expectancy, GDP, and Population (2007)") +
+  theme_minimal()
+
+
+```
+
+### 1.3.7 Parallel Co-ordinates Chart
+
+```{r parallelchart}
+library(ggplot2)
+library(GGally)
+
+gapminder_parallel <- gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarise(
+    lifeExp = mean(lifeExp),
+    gdpPercap = mean(gdpPercap),
+    pop = mean(pop),
+    .groups = "drop"
+  ) %>%
+  mutate(across(lifeExp:pop, normalize))  # Normalize data
+
+# Plot
+ggparcoord(gapminder_parallel, columns = 2:4, groupColumn = 1, scale = "globalminmax") +
+  labs(title = "Parallel Coordinates Plot: Life Expectancy, GDP, and Population (2007)") +
+  theme_minimal()
+
+```

@@ -1,0 +1,22 @@
+---
+title: "A Simple dashboard"
+format: 
+  dashboard:
+    orientation: rows
+---
+
+```{r}
+library(gapminder)
+```
+
+
+```{r}
+#| title: "Plot 1"
+plot(gapminder)
+```
+
+
+```{r}
+#| title: "Plot 2"
+plot(gapminder$lifeExp)
+```

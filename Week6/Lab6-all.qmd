@@ -1,0 +1,151 @@
+---
+title: "CMPU4091 Visualizing Data"
+subtitle: "Bike Rental Dashboard Lab 6"
+format:
+  html:
+    theme: cyborg
+    self-contained: true
+    code-fold: true
+    toc: true
+    dashboard: true
+editor: visual
+---
+
+## Interactive Bike Rental Dashboard
+
+```{r setup-libraries, include=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE)
+    }
+    library(pkg, character.only = TRUE)
+  }))
+}
+
+# Install & Load Packages Silently
+quiet_library("ggplot2")
+quiet_library("plotly")
+quiet_library("dplyr")
+quiet_library("ggstream")
+quiet_library("lubridate")
+quiet_library("tidyverse")
+
+# Load the dataset
+bike_data <- read.csv("day.csv")
+
+# Convert date column to Date type
+bike_data$dteday <- as.Date(bike_data$dteday)
+
+# Change season values for better readability
+bike_data$season <- factor(bike_data$season, 
+                           levels = c(1, 2, 3, 4), 
+                           labels = c("Spring", "Summer", "Fall", "Winter"))
+```
+
+::::::::::: {.panel-fill layout="[ [1], [1,1] ]" style="max-width: 900px; margin: auto;"}
+:::::::::: panel-tabset
+### Total Bike Rentals Across Seasons
+
+::: panel
+```{r}
+bike_data$tooltip_text <- paste("Season:", bike_data$season,
+                                "<br>Total Rentals:", bike_data$cnt)
+
+p_bar <- ggplot(bike_data, aes(x = factor(season), y = cnt, fill = factor(season), text = tooltip_text)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Bike Rentals Across Seasons", x = "Season", y = "Total Rentals") +
+  theme_minimal()
+
+ggplotly(p_bar, tooltip = "text")
+```
+:::
+
+### Divergent Bar Chart
+
+::: panel
+```{r}
+bike_deviation <- bike_data %>%
+  mutate(mean_cnt = mean(cnt), deviation = cnt - mean_cnt)
+
+p_divergent <- ggplot(bike_deviation, aes(x = dteday, y = deviation, fill = deviation > 0)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("red", "blue")) +
+  labs(title = "Divergent Bar Chart: Rentals Above/Below Average", x = "Date", y = "Deviation from Average") +
+  theme_minimal()
+
+ggplotly(p_divergent)
+```
+:::
+
+### Bike Rentals Over Time (Simple Time Series)
+
+::: panel
+```{r}
+p_time_series <- ggplot(bike_data, aes(x = dteday, y = cnt, group = 1, text = paste("Date:", dteday, "<br>Total Rentals:", cnt))) +
+  geom_point(color = "black", size = 1) +
+  labs(title = "Bike Rentals Over Time", x = "Date", y = "Total Rentals") +
+  theme_minimal()
+
+ggplotly(p_time_series, tooltip = "text")
+```
+:::
+
+### Casual vs. Registered Users Over Time
+
+::: panel
+```{r}
+bike_long <- bike_data %>%
+  select(dteday, casual, registered, yr) %>%
+  pivot_longer(cols = c(casual, registered), names_to = "user_type", values_to = "count")
+
+p <- ggplot(bike_long, aes(x = dteday, y = count, color = user_type, frame = yr, text = paste("Date: ", dteday, "<br>User Type: ", user_type, "<br>Count: ", count))) +
+  geom_point(size = 1) +
+  scale_color_manual(values = c("registered" = "blue", "casual" = "red")) +
+  labs(title = "Casual vs Registered Users Over Time", x = "Date", y = "Count") +
+  theme_minimal()
+
+# Make it interactive and animated
+ggplotly(p, tooltip = "text") %>% animation_opts(frame = 1000, easing = "linear")
+```
+:::
+
+### Bike Rental Trends by Season (Facet Grid)
+
+::: panel
+```{r}
+p_facet <- ggplot(bike_data, aes(x = dteday, y = cnt, color = factor(season))) +
+  geom_line() +
+  facet_wrap(~ season, scales = "free_y") +
+  labs(title = "Bike Rentals Trends by Season", x = "Date", y = "Total Rentals") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p_facet)
+```
+:::
+
+### Evolution of User Types Over Time (Streamgraph)
+
+::: panel
+```{r}
+bike_stream <- bike_data %>%
+  select(dteday, casual, registered) %>%
+  pivot_longer(cols = c(casual, registered), names_to = "user_type", values_to = "count")
+
+p_stream <- ggplot(bike_stream, aes(x = dteday, y = count, fill = user_type)) +
+  geom_stream(type = "proportional") +
+  labs(title = "Evolution of User Types Over Time", x = "Date", y = "Count") +
+  theme_minimal()
+
+ggplotly(p_stream)
+```
+:::
+
+::: :::
+:::
+::::::::::
+:::::::::::

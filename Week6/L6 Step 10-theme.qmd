@@ -1,0 +1,91 @@
+---
+title: "A Simple dashboard"
+format: 
+  html:
+    theme: cyborg
+    self-contained: true
+    code-fold: true
+    dashboard: true
+---
+
+Welcome to the First Interactive Dashboard.
+
+
+```{r setup, include=FALSE}
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+# Install & Load Packages Silently
+quiet_library("ggplot2")
+quiet_library("plotly")
+quiet_library("gapminder")
+quiet_library("tidyverse")
+```
+
+
+ 
+::: {.panel-fill layout="[ [1], [1,1] ]" style="max-width: 800px; margin: auto;"}
+
+::: panel-tabset
+
+### Trend Over Time
+::: {.panel style="margin: auto; max-width: 600px; border: 2px solid #ccc; padding: 15px;"}
+```{r }
+p_bar <- gapminder %>%
+  filter(year >= 1990) %>%  # Keep only years from 1990 onward
+  group_by(year, continent) %>%
+  summarize(lifeExp = mean(lifeExp), .groups = "drop") %>%
+  ggplot(aes(x = factor(year), y = lifeExp, fill = continent)) +
+  geom_col(position = "dodge") +
+  labs(title = "Average Life Expectancy by Continent (1990+)",
+       x = "Year",
+       y = "Life Expectancy",
+       fill = "Continent") +
+  theme_bw()
+
+plotly::ggplotly(p_bar)
+```
+:::
+
+### Distribution
+
+::: panel
+```{r}
+
+data <- gapminder  
+g <- ggplot(data, aes(x = lifeExp, fill = factor(year))) +
+  geom_histogram(binwidth = 2, alpha = 0.6, position = "identity") +
+  labs(title = "Histogram of Life Expectancy by Year",
+       x = "Life Expectancy",
+       y = "Count",
+       fill = "Year") +
+  theme_minimal()
+plotly::ggplotly(g)
+```
+:::
+
+
+### Scatter Plot
+::: panel
+```{r}
+
+g <- ggplot(data, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.6) +
+  scale_x_log10() +
+  labs(title = "Life Expectancy vs GDP per Capita",
+       x = "GDP per Capita (log scale)",
+       y = "Life Expectancy",
+       color = "Continent") +
+  theme_minimal()
+plotly::ggplotly(g)
+```
+:::
+:::
+:::

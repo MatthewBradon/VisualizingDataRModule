@@ -1,0 +1,25 @@
+---
+title: "A Simple dashboard"
+format: 
+  dashboard:
+    orientation: rows
+    self-contained: true
+---
+
+```{r}
+library(gapminder)
+```
+
+## Row
+This is a dashboard which explores the gapminder dataset
+
+## Row
+```{r}
+#| title: "Plot 1"
+plot(gapminder)
+```
+
+```{r}
+#| title: "Plot 2"
+plot(gapminder$lifeExp)
+```
