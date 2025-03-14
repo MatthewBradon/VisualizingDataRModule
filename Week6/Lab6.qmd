@@ -46,8 +46,8 @@ bike_data$season <- factor(bike_data$season,
                            labels = c("Spring", "Summer", "Fall", "Winter"))
 ```
 
-::::::::::: {.panel-fill layout="[ [1], [1,1] ]" style="max-width: 900px; margin: auto;"}
-:::::::::: panel-tabset
+::::::: {.panel-fill layout="[ [1], [1,1] ]" style="max-width: 900px; margin: auto;"}
+:::::: panel-tabset
 ### Total Bike Rentals Across Seasons
 
 ::: panel
@@ -97,6 +97,5 @@ p_facet <- ggplot(bike_data, aes(x = dteday, y = cnt, color = factor(season))) +
 ggplotly(p_facet)
 ```
 :::
-
-::::::::::
-:::::::::::
+::::::
+:::::::

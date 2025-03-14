@@ -44,9 +44,13 @@ head(bike_data)
 summary(bike_data)
 ```
 
+
+
 ## Charts
 
 ### Step 1: Simple Bar Chart
+
+
 
 ```{r}
 # Change the values of the season column
@@ -69,7 +73,11 @@ ggplotly(p, tooltip = "text")
 
 ```
 
+
+
 ### Step 2: Divergent Bar Chart
+
+
 
 ```{r}
 # Calculate deviation from average
@@ -87,7 +95,11 @@ ggplotly(p)
 
 ```
 
+
+
 ### Step 3: Simple Time Series
+
+
 
 ```{r}
 # Ensure the data is sorted by date
@@ -104,7 +116,11 @@ ggplotly(p, tooltip = "text")
 
 ```
 
+
+
 ### Step 4: Multi Time Series
+
+
 
 ```{r}
 bike_long <- bike_data %>%
@@ -121,7 +137,11 @@ p <- ggplot(bike_long, aes(x = dteday, y = count, color = user_type, frame = yr,
 ggplotly(p, tooltip = "text") %>% animation_opts(frame = 1000, easing = "linear")
 ```
 
+
+
 ### Step 5: Facet Grid
+
+
 
 ```{r}
 p <- ggplot(bike_data, aes(x = dteday, y = cnt, color = factor(season))) +
@@ -146,7 +166,11 @@ p_grid <- ggplot(bike_data, aes(x = dteday, y = cnt, color = factor(season))) +
 ggplotly(p_grid)
 ```
 
+
+
 ### Step 6: Streamgraph
+
+
 
 ```{r}
 bike_stream <- bike_data %>%
