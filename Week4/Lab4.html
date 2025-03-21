@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.40">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -64,10 +64,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="Lab4_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Lab4_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Lab4_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Lab4_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Lab4_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Lab4_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Lab4_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Lab4_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Lab4_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 <link rel="stylesheet" href="./styles.css">
@@ -188,8 +188,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>
-</p><p>Optimism, Postive affect and Mastery are left skewed and Negative Affect is right skewed.</p>
-<p></p>
+Optimism, Postive affect and Mastery are left skewed and Negative Affect is right skewed.
+</p>
 </section>
 <section id="smoking-status-bar-chart" class="level1">
 <h1>Smoking Status Bar Chart</h1>
@@ -254,7 +254,7 @@ There is a major class imbalance of non smoker to smokers is this a possible sou
 </p><p>The 3rd quartile of people who dont smoke is higher but the median of smoker is higher than non smokers. The 1st quartile of smokers is lower than that of non smokers</p>
 <p>The minimum and maximum of both classes are around the same</p>
 <p>In non smokers there are two outliers who are really low on optimism.</p>
-We do have significantly less examples of smokers than non smokers if our dataset was larger there might have been a bigger difference in the box plots.
+<p>We do have significantly less examples of smokers than non smokers if our dataset was larger there might have been a bigger difference in the box plots.</p>
 <p></p>
 </section>
 <section id="exploring-relaitonships" class="level1">
@@ -303,7 +303,7 @@ cor    tmast   0.5690816 5.695808e-30</code></pre>
 <p>
 </p><p>Each of the correlations are moderate i.e 0.3 to 0.6</p>
 <p>Mastery has the highest correlation with Optimism at 0.569.</p>
-All of the correlations for the psychological factors all have a P value &lt; 0.05 making it seem to be statically significant enough to rule out random chance.
+<p>All of the correlations for the psychological factors all have a P value &lt; 0.05 making it seem to be statically significant enough to rule out random chance.</p>
 <p></p>
 </section>
 <section id="scatterplot-with-linear-regression" class="level2">
@@ -355,7 +355,7 @@ All of the correlations for the psychological factors all have a P value &lt; 0.
 <p>
 </p><p>Positive affect has a a moderate positive correlation with Optimism meaning that happier people tend to be more optimistic</p>
 <p>Mastery has a moderate positive correlation with Optimism meaning those who feel in control tend to be more optimistic</p>
-Negative Affect hasa moderate negative correlation meaning that more negative emotions tend to lower your optimism
+<p>Negative Affect hasa moderate negative correlation meaning that more negative emotions tend to lower your optimism</p>
 <p></p>
 </section>
 <section id="correlation-heatmap" class="level2">
@@ -399,7 +399,7 @@ Negative Affect hasa moderate negative correlation meaning that more negative em
 <p>
 </p><p>Blue squres are negative correlation and Red squares are positive correlation</p>
 <p>I.e Positive Affect and Negative Affect have moderate negative correlation as happier people tend to have less negative thoughts.</p>
-People who are more in control tend to be happier and optimistic
+<p>People who are more in control tend to be happier and optimistic</p>
 <p></p>
 <!-- -->
 
@@ -919,97 +919,97 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="in">#This has been saved to a .dat format - more easily readable in R.</span></span>
 <span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="in"># Load dataset - format the location using file.path to ensure it will locate it correctly</span></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="in">mydata &lt;- file.path("C:/Users/Matt/Desktop/VisualizingDataRModule/Week4")</span></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="in">datapath &lt;- file.path(mydata,'survey.dat')</span></span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="in">#Load it into the dataframe called survey (.dat file so use read.Table)</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="in">survey &lt;- read.table(datapath)</span></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="in">#Setting the column names to be that used in the dataset but in lowercase to make life a bit easier</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="in">colnames(survey) &lt;- tolower(colnames(survey))</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="in">survey &lt;- na.omit(survey)</span></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="fu"># Summarise the data</span></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>summary(survey)</span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>str(survey)</span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="fu"># Histograms with Density Plots</span></span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimism Histogram</span></span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>toptim_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> toptim)) <span class="sc">+</span></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism"</span>, <span class="at">x =</span> <span class="st">"Optimism"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Positive Affect Histogram</span></span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>tposaff_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tposaff)) <span class="sc">+</span></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Positive Affect"</span>, <span class="at">x =</span> <span class="st">"Positive Affect"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Negative Affect Histogram</span></span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>tnegaff_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tnegaff)) <span class="sc">+</span></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"darkgreen"</span>) <span class="sc">+</span></span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Negative Affect"</span>, <span class="at">x =</span> <span class="st">"Negative Affect"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Mastery Histogram</span></span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>tmast_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tmast)) <span class="sc">+</span></span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mastery"</span>, <span class="at">x =</span> <span class="st">"Mastery"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange the plots using cowplot</span></span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>histogram_grid <span class="ot">&lt;-</span> <span class="fu">plot_grid</span>(toptim_hist, tposaff_hist, tnegaff_hist, tmast_hist, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the grid</span></span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>histogram_grid</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="in"># I work on windows on desktop but mac laptop for demo</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="in"># mydata &lt;- file.path("C:/Users/Matt/Desktop/VisualizingDataRModule/Week4")</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="in">mydata &lt;- file.path("/Users/xsmoked/Desktop/College/Sem2/VisualizingData/Week4")</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="in">datapath &lt;- file.path(mydata,'survey.dat')</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="in">#Load it into the dataframe called survey (.dat file so use read.Table)</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="in">survey &lt;- read.table(datapath)</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="in">#Setting the column names to be that used in the dataset but in lowercase to make life a bit easier</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="in">colnames(survey) &lt;- tolower(colnames(survey))</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="in">survey &lt;- na.omit(survey)</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Summarise the data</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>summary(survey)</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>str(survey)</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="fu"># Histograms with Density Plots</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimism Histogram</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>toptim_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> toptim)) <span class="sc">+</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism"</span>, <span class="at">x =</span> <span class="st">"Optimism"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="co"># Positive Affect Histogram</span></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>tposaff_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tposaff)) <span class="sc">+</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Positive Affect"</span>, <span class="at">x =</span> <span class="st">"Positive Affect"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="co"># Negative Affect Histogram</span></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>tnegaff_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tnegaff)) <span class="sc">+</span></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"darkgreen"</span>) <span class="sc">+</span></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Negative Affect"</span>, <span class="at">x =</span> <span class="st">"Negative Affect"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="co"># Mastery Histogram</span></span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>tmast_hist <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> tmast)) <span class="sc">+</span></span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)), <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">adjust =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mastery"</span>, <span class="at">x =</span> <span class="st">"Mastery"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange the plots using cowplot</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>histogram_grid <span class="ot">&lt;-</span> <span class="fu">plot_grid</span>(toptim_hist, tposaff_hist, tnegaff_hist, tmast_hist, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
 <span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>Optimism, Postive affect and Mastery are left skewed and Negative Affect is right skewed.</span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the grid</span></span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>histogram_grid</span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;Optimism, Postive affect and Mastery are left skewed and Negative Affect is right skewed.&lt;/p&gt;</span>
 <span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="fu"># Smoking Status Bar Chart</span></span>
 <span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a></span>
@@ -1029,29 +1029,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>smoke_bar</span>
 <span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>There is a major class imbalance of non smoker to smokers is this a possible source of the skewness we observe above.</span>
-<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;There is a major class imbalance of non smoker to smokers is this a possible source of the skewness we observe above.&lt;/p&gt;</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a><span class="fu"># Box plot Comparing optimism between smokers and non smokers</span></span>
 <span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a><span class="fu"># Box plot Comparing optimism between smokers and non smokers</span></span>
-<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{R}</span></span>
-<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a><span class="co"># Box plot Comparing optimism between smokers and non smokers</span></span>
-<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a>smoke_box <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> smoke, <span class="at">y =</span> toptim, <span class="at">fill =</span> smoke)) <span class="sc">+</span></span>
-<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Boxplot of Optimism by Smoking Status"</span>, <span class="at">x =</span> <span class="st">"Smoking Status"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>, <span class="at">fill =</span> <span class="st">"Smoking Status"</span>) <span class="sc">+</span></span>
-<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
-<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a>smoke_box</span>
-<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a><span class="in">```{R}</span></span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a><span class="co"># Box plot Comparing optimism between smokers and non smokers</span></span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>smoke_box <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(survey, <span class="fu">aes</span>(<span class="at">x =</span> smoke, <span class="at">y =</span> toptim, <span class="at">fill =</span> smoke)) <span class="sc">+</span></span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Boxplot of Optimism by Smoking Status"</span>, <span class="at">x =</span> <span class="st">"Smoking Status"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>, <span class="at">fill =</span> <span class="st">"Smoking Status"</span>) <span class="sc">+</span></span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>smoke_box</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a>The 3rd quartile of people who dont smoke is higher but the median of smoker is higher than non smokers. The 1st quartile of smokers is lower than that of non smokers</span>
 <span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a>The minimum and maximum of both classes are around the same</span>
@@ -1059,114 +1059,127 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a>In non smokers there are two outliers who are really low on optimism.</span>
 <span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a>We do have significantly less examples of smokers than non smokers if our dataset was larger there might have been a bigger difference in the box plots.</span>
-<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
-<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a><span class="fu"># Exploring Relaitonships</span></span>
-<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Correlation coefficients and p-values</span></span>
-<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;The correlation between Total optimism and positive affect, negative affect and mastery&lt;/p&gt;</span>
-<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"tposaff"</span>, <span class="st">"tnegaff"</span>, <span class="st">"tmast"</span>)) {</span>
-<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>  var_data <span class="ot">&lt;-</span> survey <span class="sc">%&gt;%</span> <span class="fu">select</span>(toptim, <span class="sc">!!</span><span class="fu">sym</span>(var)) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
-<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a>      <span class="at">Optimism =</span> toptim,</span>
-<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a>      <span class="at">Variable =</span> <span class="sc">!!</span><span class="fu">sym</span>(var)</span>
-<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(var_data) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
-<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a>    cor_result <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(var_data<span class="sc">$</span>Optimism, var_data<span class="sc">$</span>Variable)</span>
-<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Variable:"</span>, var, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
-<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">data.frame</span>(</span>
-<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>      <span class="at">Variable =</span> var,</span>
-<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a>      <span class="at">Correlation =</span> cor_result<span class="sc">$</span>estimate,</span>
-<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a>      <span class="at">P_value =</span> cor_result<span class="sc">$</span>p.value</span>
-<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-215"><a href="#cb9-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-216"><a href="#cb9-216" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a>Each of the correlations are moderate i.e 0.3 to 0.6</span>
-<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a>Mastery has the highest correlation with Optimism at 0.569.</span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a><span class="fu"># Exploring Relaitonships</span></span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a><span class="fu">## Correlation coefficients and p-values</span></span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;The correlation between Total optimism and positive affect, negative affect and mastery&lt;/p&gt;</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"tposaff"</span>, <span class="st">"tnegaff"</span>, <span class="st">"tmast"</span>)) {</span>
+<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a>  var_data <span class="ot">&lt;-</span> survey <span class="sc">%&gt;%</span> <span class="fu">select</span>(toptim, <span class="sc">!!</span><span class="fu">sym</span>(var)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a>      <span class="at">Optimism =</span> toptim,</span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>      <span class="at">Variable =</span> <span class="sc">!!</span><span class="fu">sym</span>(var)</span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(var_data) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a>    cor_result <span class="ot">&lt;-</span> <span class="fu">cor.test</span>(var_data<span class="sc">$</span>Optimism, var_data<span class="sc">$</span>Variable)</span>
+<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Variable:"</span>, var, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a>      <span class="at">Variable =</span> var,</span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a>      <span class="at">Correlation =</span> cor_result<span class="sc">$</span>estimate,</span>
+<span id="cb9-215"><a href="#cb9-215" aria-hidden="true" tabindex="-1"></a>      <span class="at">P_value =</span> cor_result<span class="sc">$</span>p.value</span>
+<span id="cb9-216"><a href="#cb9-216" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-220"><a href="#cb9-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-221"><a href="#cb9-221" aria-hidden="true" tabindex="-1"></a>All of the correlations for the psychological factors all have a P value &lt; 0.05 making it seem to be statically significant enough to rule out random chance.</span>
-<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
-<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scatterplot with linear regression</span></span>
-<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a>create_scatterplots_toptim <span class="ot">&lt;-</span> <span class="cf">function</span>(data, title) {</span>
-<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tposaff, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
-<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Positive Affect"</span>, <span class="at">x =</span> <span class="st">"Positive Affect"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
-<span id="cb9-233"><a href="#cb9-233" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
-<span id="cb9-234"><a href="#cb9-234" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a>  p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tnegaff, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
-<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
-<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Negative Affect"</span>, <span class="at">x =</span> <span class="st">"Negative Affect"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
-<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
-<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a>  p3 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tmast, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
-<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
-<span id="cb9-243"><a href="#cb9-243" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb9-244"><a href="#cb9-244" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Mastery"</span>, <span class="at">x =</span> <span class="st">"Mastery"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
-<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
-<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine plots using patchwork</span></span>
-<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a>  (p1 <span class="sc">/</span> p2 <span class="sc">/</span> p3) <span class="sc">+</span> </span>
-<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a>    patchwork<span class="sc">::</span><span class="fu">plot_annotation</span>(<span class="at">title =</span> title, <span class="at">theme =</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)))</span>
-<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function with the dataset</span></span>
-<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a>scatter_plots <span class="ot">&lt;-</span> <span class="fu">create_scatterplots_toptim</span>(survey, <span class="st">"Scatterplots of Optimism and Psychological Factors"</span>)</span>
-<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(scatter_plots)</span>
-<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a>Positive affect has a a moderate positive correlation with Optimism meaning that happier people tend to be more optimistic</span>
-<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a>Mastery has a moderate positive correlation with Optimism meaning those who feel in control tend to be more optimistic</span>
-<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a>Negative Affect hasa moderate negative correlation meaning that more negative emotions tend to lower your optimism</span>
-<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-221"><a href="#cb9-221" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a>Each of the correlations are moderate i.e 0.3 to 0.6</span>
+<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-225"><a href="#cb9-225" aria-hidden="true" tabindex="-1"></a>Mastery has the highest correlation with Optimism at 0.569.</span>
+<span id="cb9-226"><a href="#cb9-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a>All of the correlations for the psychological factors all have a P value <span class="sc">\&lt;</span> 0.05 making it seem to be statically significant enough to rule out random chance.</span>
+<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scatterplot with linear regression</span></span>
+<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a>create_scatterplots_toptim <span class="ot">&lt;-</span> <span class="cf">function</span>(data, title) {</span>
+<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tposaff, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
+<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Positive Affect"</span>, <span class="at">x =</span> <span class="st">"Positive Affect"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
+<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-243"><a href="#cb9-243" aria-hidden="true" tabindex="-1"></a>  p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tnegaff, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
+<span id="cb9-244"><a href="#cb9-244" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Negative Affect"</span>, <span class="at">x =</span> <span class="st">"Negative Affect"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
+<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a>  p3 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> tmast, <span class="at">y =</span> toptim)) <span class="sc">+</span></span>
+<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
+<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Optimism vs. Mastery"</span>, <span class="at">x =</span> <span class="st">"Mastery"</span>, <span class="at">y =</span> <span class="st">"Optimism"</span>) <span class="sc">+</span></span>
+<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine plots using patchwork</span></span>
+<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a>  (p1 <span class="sc">/</span> p2 <span class="sc">/</span> p3) <span class="sc">+</span> </span>
+<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a>    patchwork<span class="sc">::</span><span class="fu">plot_annotation</span>(<span class="at">title =</span> title, <span class="at">theme =</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)))</span>
+<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a><span class="co"># Call the function with the dataset</span></span>
+<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a>scatter_plots <span class="ot">&lt;-</span> <span class="fu">create_scatterplots_toptim</span>(survey, <span class="st">"Scatterplots of Optimism and Psychological Factors"</span>)</span>
+<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(scatter_plots)</span>
+<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-265"><a href="#cb9-265" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a><span class="fu">## Correlation Heatmap</span></span>
-<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to create a heatmap</span></span>
-<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a>create_heatmap <span class="ot">&lt;-</span> <span class="cf">function</span>(data, title) {</span>
-<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Select only relevant columns</span></span>
-<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a>  selected_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">select</span>(toptim, tposaff, tnegaff, tmast)</span>
-<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute correlation matrix</span></span>
-<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a>  corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(selected_data, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-267"><a href="#cb9-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-268"><a href="#cb9-268" aria-hidden="true" tabindex="-1"></a>Positive affect has a a moderate positive correlation with Optimism meaning that happier people tend to be more optimistic</span>
+<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a>Mastery has a moderate positive correlation with Optimism meaning those who feel in control tend to be more optimistic</span>
+<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a>Negative Affect hasa moderate negative correlation meaning that more negative emotions tend to lower your optimism</span>
+<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a><span class="fu">## Correlation Heatmap</span></span>
 <span id="cb9-277"><a href="#cb9-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-278"><a href="#cb9-278" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Generate heatmap</span></span>
-<span id="cb9-279"><a href="#cb9-279" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggcorrplot</span>(corr_matrix, </span>
-<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a>                  <span class="at">type =</span> <span class="st">"lower"</span>, </span>
-<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a>                  <span class="at">lab =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a>                  <span class="at">lab_size =</span> <span class="dv">3</span>, </span>
-<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#6D9EC1"</span>, <span class="st">"white"</span>, <span class="st">"#E46726"</span>), </span>
-<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a>                  <span class="at">title =</span> title, </span>
-<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
-<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span>
-<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)  <span class="co"># Ensure function returns the plot</span></span>
-<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate and display the heatmap</span></span>
-<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a>heatmap <span class="ot">&lt;-</span> <span class="fu">create_heatmap</span>(survey, <span class="st">"Correlation Heatmap of Psychological Factors"</span>)</span>
-<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(heatmap)</span>
-<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
-<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a>Blue squres are negative correlation and Red squares are positive correlation</span>
-<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a>I.e Positive Affect and Negative Affect have moderate negative correlation as happier people tend to have less negative thoughts.</span>
+<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to create a heatmap</span></span>
+<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a>create_heatmap <span class="ot">&lt;-</span> <span class="cf">function</span>(data, title) {</span>
+<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Select only relevant columns</span></span>
+<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a>  selected_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">select</span>(toptim, tposaff, tnegaff, tmast)</span>
+<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute correlation matrix</span></span>
+<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a>  corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(selected_data, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Generate heatmap</span></span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggcorrplot</span>(corr_matrix, </span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a>                  <span class="at">type =</span> <span class="st">"lower"</span>, </span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a>                  <span class="at">lab =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a>                  <span class="at">lab_size =</span> <span class="dv">3</span>, </span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a>                  <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#6D9EC1"</span>, <span class="st">"white"</span>, <span class="st">"#E46726"</span>), </span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a>                  <span class="at">title =</span> title, </span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span>
+<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)  <span class="co"># Ensure function returns the plot</span></span>
+<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb9-301"><a href="#cb9-301" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a>People who are more in control tend to be happier and optimistic</span>
-<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
+<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate and display the heatmap</span></span>
+<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a>heatmap <span class="ot">&lt;-</span> <span class="fu">create_heatmap</span>(survey, <span class="st">"Correlation Heatmap of Psychological Factors"</span>)</span>
+<span id="cb9-304"><a href="#cb9-304" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(heatmap)</span>
+<span id="cb9-305"><a href="#cb9-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-306"><a href="#cb9-306" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-307"><a href="#cb9-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-308"><a href="#cb9-308" aria-hidden="true" tabindex="-1"></a>&lt;p&gt;</span>
+<span id="cb9-309"><a href="#cb9-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-310"><a href="#cb9-310" aria-hidden="true" tabindex="-1"></a>Blue squres are negative correlation and Red squares are positive correlation</span>
+<span id="cb9-311"><a href="#cb9-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-312"><a href="#cb9-312" aria-hidden="true" tabindex="-1"></a>I.e Positive Affect and Negative Affect have moderate negative correlation as happier people tend to have less negative thoughts.</span>
+<span id="cb9-313"><a href="#cb9-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-314"><a href="#cb9-314" aria-hidden="true" tabindex="-1"></a>People who are more in control tend to be happier and optimistic</span>
+<span id="cb9-315"><a href="#cb9-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-316"><a href="#cb9-316" aria-hidden="true" tabindex="-1"></a>&lt;/p&gt;</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

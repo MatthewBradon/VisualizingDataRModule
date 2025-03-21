@@ -1,0 +1,78 @@
+---
+title: "CMPU4091 Visualizing Data Assignment"
+subtitle: "Are Electric Vehicles a more sustainable option"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    dashboard: true
+editor: visual
+---
+
+```{r setup-libraries, include=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE)
+    }
+    library(pkg, character.only = TRUE)
+  }))
+}
+
+quiet_library("ggplot2")
+quiet_library("plotly")
+quiet_library("dplyr")
+quiet_library("ggstream")
+quiet_library("lubridate")
+quiet_library("tidyverse")
+
+```
+
+```{r}
+# Load required libraries
+library(tidyverse)
+
+# Read in the datasets.
+# If your files are named differently, update these file paths accordingly.
+# dataset1 <- read_csv("IEA-EV-dataElectricity demandHistoricalCars.csv")
+# dataset2 <- read_csv("IEA-EV-dataEV charging pointsHistoricalEV.csv")
+# dataset3 <- read_csv("IEA-EV-dataEV salesHistoricalCars.csv")
+# dataset4 <- read_csv("IEA-EV-dataOil displacement MbdHistoricalCars.csv")
+
+# Merge all datasets by row-binding (they share the same columns)
+merged_data <- bind_rows(dataset1, dataset2, dataset3, dataset4)
+
+# Optional: Remove duplicate rows if you do not want repeated entries
+merged_data <- distinct(merged_data)
+
+# Save the merged dataset as merge.csv
+write_csv(merged_data, "merged_data.csv")
+
+# Print the first few rows of the merged data to verify
+print(head(merged_data))
+
+# Read in datasets (Update file paths as needed)
+merged_data <- read_csv("merged_data.csv")
+energy_data <- read_csv("owid-energy-data.csv")
+
+# Rename 'region' to 'country' in EV dataset to match Energy dataset
+merged_data <- merged_data %>%
+  rename(country = region)
+
+# Ensure 'year' is numeric in both datasets
+merged_data <- merged_data %>% mutate(year = as.numeric(year))
+energy_data <- energy_data %>% mutate(year = as.numeric(year))
+
+# Merge datasets using left join (keeping all EV records)
+merged_data <- left_join(merged_data, energy_data, by = c("country", "year"))
+
+# Save merged dataset
+write_csv(merged_data, "merged_ev_energy.csv")
+
+# Display first few rows of merged data
+print(head(merged_data))
+```

@@ -1,0 +1,37 @@
+---
+title: "CMPU4091 Visualizing Data Assignment"
+subtitle: "Are Electric Vehicles a more sustainable option"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    dashboard: true
+editor: visual
+---
+
+```{r setup-libraries, include=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE)
+    }
+    library(pkg, character.only = TRUE)
+  }))
+}
+
+quiet_library("ggplot2")
+quiet_library("plotly")
+quiet_library("dplyr")
+quiet_library("ggstream")
+quiet_library("lubridate")
+quiet_library("tidyverse")
+
+```
+
+```{r}
+
+```
