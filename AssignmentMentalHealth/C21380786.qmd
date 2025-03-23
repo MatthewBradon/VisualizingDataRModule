@@ -1,6 +1,8 @@
 ---
 title: "CMPU4091 Visualizing Data Assignment"
-subtitle: "Are Electric Vehicles a more sustainable option"
+subtitle: "Tech companies with good benefits improve mental health of employees"
+author: "C21380786 Matthew Bradon"
+date: "`r Sys.Date()`"
 format:
   html:
     self-contained: true
@@ -9,6 +11,56 @@ format:
     dashboard: true
 editor: visual
 ---
+
+## Introduction
+
+Mental health has become an increasingly important topic in modern workplaces, especially in high-stress and fast-paced industries like technology. Employees in tech companies often face long hours, tight deadlines, and a culture that prizes productivity—conditions that can exacerbate mental health challenges. This project explores the relationship between workplace benefits and mental health outcomes for employees in the tech sector using real-world survey data.
+
+The primary goal of this analysis is to determine whether supportive workplace policies such as remote work, access to mental health care options, wellness programs, and flexible leave policies correlate with improved mental health outcomes. Specifically, we examine whether these benefits increase the likelihood of employees seeking treatment and reduce self-reported work interference due to mental health conditions.
+
+
+The dataset used for is the analysis a 2014 Mental Health in Tech Survey found on kaggle (https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey). Transformations on gender and age were done, as well as an age group was added for better analysis.
+
+- Some of the following columns are:
+
+  - **family_history:** Do you have a family history of mental illness?
+
+  - **treatment:** Have you sought treatment for a mental health condition?
+
+  - **work_interfere:** If you have a mental health condition, do you feel that it interferes with your work?
+
+  - **no_employees:** How many employees does your company or organization have?
+
+  - **remote_work:** Do you work remotely (outside of an office) at least 50% of the time?
+
+  - **tech_company:** Does your employer provide mental health benefits?
+
+  - **care_options:** Do you know the options for mental health care your employer provides?
+
+  - **wellness_program:** Does your employer provide resources to learn more about mental health issues and how to seek help?
+
+  - **anonymity:** Is your anonymity protected if you choose to take advantage of mental health or substance abuse treatment resources?
+
+  - **leave:** How easy is it for you to take medical leave for a mental health condition?
+
+  - **mental_health_consequence:** Do you think that discussing a mental health issue with your employer would have negative consequences?
+
+  - **phys_health_consequence:** Do you think that discussing a physical health issue with your employer would have negative consequences?
+
+  - **coworkers:** Would you be willing to discuss a mental health issue with your coworkers?
+
+  - **supervisor:** Would you be willing to discuss a mental health issue with your direct supervisor(s)?
+
+  - **mental_health_interview:** Would you bring up a mental health issue with a potential employer in an interview?
+
+  - **phys_health_interview:** Would you bring up a physical health issue with a potential employer in an interview?
+
+  - **mental_vs_physical:** Do you feel that your employer takes mental health as seriously as physical health?
+
+  - **obs_consequence:** Have you heard of or observed negative consequences for coworkers with mental health conditions in your workplace?
+
+
+
 
 ```{r setup-libraries, include=FALSE}
 options(repos = c(CRAN = "https://cloud.r-project.org"))
@@ -29,9 +81,327 @@ quiet_library("dplyr")
 quiet_library("ggstream")
 quiet_library("lubridate")
 quiet_library("tidyverse")
+quiet_library("DT")
+quiet_library("janitor")
+quiet_library("packcircles")
+quiet_library("ggrepel")
+quiet_library("heatmaply")
+
 
 ```
+
+## Data Preparation and Cleaning
 
 ```{r}
 
+# Load and clean dataset
+mental_health <- read_csv("survey.csv") %>%
+  janitor::clean_names()
+
+cat(strwrap(toString(unique(mental_health$gender)), width = 80), sep = "\n")
+
+
+# Data cleaning and transformation
+mental_health <- mental_health %>%
+  filter(!is.na(age) & age > 15 & age < 100) %>%
+  mutate(
+    gender = str_to_lower(gender),
+    gender = case_when(
+      str_detect(gender, "female|f") ~ "Female",
+      str_detect(gender, "male|m") ~ "Male",
+      TRUE ~ "Other"
+    ),
+    treatment = ifelse(treatment == "Yes", "Treated", "Not Treated"),
+    age_group = cut(
+      age,
+      breaks = c(seq(10, 60, by = 5), Inf),  # 10, 15, ..., 60, Inf
+      labels = c("10–15", "16–20", "21–25", "26–30", "31–35", "36–40", "41–45", "46–50", "51–55", "56–60", "60+"),
+      right = TRUE,
+      include.lowest = TRUE
+    )
+  )
 ```
+
+
+Gender has various different unique entries ranging from different ways of representing the two main sexes (M, m, Male, male) to Queer identities. There were some mispellings such as msle and mail. Some of the queer identities include Enby, Genderqueer, Agender, Androgyne, Trans-female. There are different spellings on the same identity i.e trans-female, Trans woman, and Female (trans). Some people also wrote Cis male or female cis. To be able to group programatically the different queer identities would be difficult and not scalable thus they will be grouped into other. Any correct spelling of male or female along with F or M will be grouped as male and female. This kind of problem could be avoided if the instead of taking a string input in the survey you used bulletpoints and if necessary an other text input.
+
+I filtered for rows in the age range of 10 to 100. There were outliers such as 999999, -1, 5 and 8 which are invalid. The age_group column was added to explore how different age groups feel. The age groups are grouped in increments of 5 starting from 10 to 60+.
+
+There is a states column which is states for the USA. However there are non US countires where there is no states value for them.
+
+
+## Data Overview
+```{r}
+datatable(mental_health)
+```
+
+
+
+## Data Exploration
+
+Below is the unique values for each column and the count.
+
+```{r}
+for (col in names(mental_health)) {
+  if (col %in% c("timestamp", "comments")) {
+    next
+  }
+  cat("Value counts for:", col, "\n")
+  print(table(mental_health[[col]], useNA = "ifany"))
+  cat("\n---------------------------\n\n")
+}
+
+```
+
+### Country breakdown
+```{r}
+# Count responses by country
+country_counts <- mental_health %>%
+  count(country, sort = TRUE)
+
+# Calculate percentages
+country_counts <- country_counts %>%
+  mutate(
+    pct = n / sum(n),
+    pct_label = paste0(round(pct * 100, 1), "%")
+  )
+
+# Generate packed circle layout
+packing <- circleProgressiveLayout(country_counts$n, sizetype = 'area')
+
+# Combine layout with data
+country_counts <- bind_cols(country_counts, packing)
+
+# Generate circle vertices for plotting
+circle_data <- circleLayoutVertices(packing, npoints = 50)
+
+# Create a label column for text + tooltip
+country_counts <- country_counts %>%
+  mutate(
+    label = ifelse(n > 3,
+                   paste0(country, "\n", n, " Responses\n", pct_label),
+                   "")
+  )
+
+# Create plot
+p_bubble <- ggplot() +
+  geom_polygon(data = circle_data,
+               aes(x, y, group = id, fill = as.factor(id)),
+               color = "white", alpha = 0.7, show.legend = FALSE) +
+  geom_text(data = country_counts,
+            aes(x = x, y = y, label = label),
+            size = 3, color = "black", fontface = "bold", lineheight = 0.9) +
+  coord_equal() +
+  theme_void() +
+  labs(title = "Survey Responses by Country (Packed Bubble Chart)")
+
+# Make interactive with proper tooltip
+ggplotly(p_bubble, tooltip = "label")
+
+```
+
+59.6% of the survey responses come from the USA with United Kingdom (14.7) and Canada (5.7%) being the next two largest. This introduces bias as how americans interact with their mental health in the workplace may be different to how other european countries work as well as eastern countries.
+### Age Distribution
+```{r}
+p1 <- ggplot(mental_health, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
+  labs(title = "Age Distribution of Survey Respondents",
+       x = "Age",
+       y = "Count")
+ggplotly(p1)
+```
+
+Most of the dataset is people whos age range from 20 to 40. This means the tech sector is mostly young workers in their careers.
+
+### Gender Distribution
+```{r}
+p2 <- ggplot(mental_health, aes(x = gender, fill = gender)) +
+  geom_bar() +
+  labs(
+    title = "Gender Distribution of Survey Respondents",
+    x = "Gender",
+    y = "Count",
+    fill = "Gender"
+  ) +
+  theme_minimal()
+ggplotly(p2)
+
+```
+
+There is significantly more men than women in the dataset which is to be expected as tech is a male dominated field. 
+
+### Correlation Heatmap with treatment
+```{r}
+# Select variables and convert to numeric
+cor_data <- mental_health %>%
+  select(
+    work_interfere,
+    age,
+    treatment,
+    remote_work,
+    tech_company,
+    care_options,
+    wellness_program,
+    seek_help,
+    anonymity,
+    leave,
+    mental_health_consequence,
+    phys_health_consequence,
+    coworkers,
+    supervisor
+  ) %>%
+  mutate(across(everything(), ~ as.numeric(as.factor(.))))  # convert all to numeric
+
+# Compute correlation matrix
+cor_matrix <- cor(cor_data, use = "complete.obs") %>% round(2)
+
+# Interactive heatmap with heatmaply
+heatmaply(
+  cor_matrix,
+  main = "Interactive Correlation Heatmap of Workplace Mental Health Factors",
+  colors = colorRampPalette(c("#E46726", "white", "#6D9EC1"))(100),
+  xlab = "", ylab = "",
+  margins = c(60, 60, 40, 20),
+  grid_color = "grey80",
+  plot_method = "plotly"
+)
+```
+
+### 1. Treatment by Age Group
+```{r}
+p3 <- ggplot(mental_health, aes(x = age_group, fill = treatment)) +
+  geom_bar(position = "fill") +
+  labs(title = "Proportion of Treatment by Age Group",
+       x = "Age Group",
+       y = "Proportion") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplotly(p3)
+```
+
+### 2. Treatment by Gender
+```{r}
+p4 <- ggplot(mental_health, aes(x = gender, fill = treatment)) +
+  geom_bar(position = "fill") +
+  labs(title = "Proportion of Treatment by Gender",
+       x = "Gender",
+       y = "Proportion") +
+  scale_y_continuous(labels = scales::percent_format())
+ggplotly(p4)
+```
+
+### 3. Treatment by Country
+```{r}
+top_countries <- mental_health %>%
+  count(country, sort = TRUE) %>%
+  top_n(10, n) %>%
+  pull(country)
+
+mental_health_top <- mental_health %>%
+  filter(country %in% top_countries)
+
+p5 <- ggplot(mental_health_top, aes(x = country, fill = treatment)) +
+  geom_bar(position = "fill") +
+  labs(title = "Proportion of Treatment by Top 10 Countries",
+       x = "Country",
+       y = "Proportion") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplotly(p5)
+```
+
+### 4. Treatment vs Remote Work
+```{r}
+p_remote_treatment <- mental_health %>%
+  filter(!is.na(remote_work), !is.na(treatment)) %>%
+  ggplot(aes(x = remote_work, fill = treatment)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Mental Health Treatment vs Remote Work",
+    x = "Remote Work",
+    y = "Proportion",
+    fill = "Sought Treatment"
+  )
+
+ggplotly(p_remote_treatment)
+```
+
+### 5. Work Interference vs Mental Health Benefits
+```{r}
+p_interference_treatment <- mental_health %>%
+  filter(!is.na(work_interfere), !is.na(treatment)) %>%
+  ggplot(aes(x = work_interfere, fill = treatment)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Treatment vs Work Interference",
+    x = "Work Interference",
+    y = "Proportion",
+    fill = "Sought Treatment"
+  )
+
+ggplotly(p_remote_treatment)
+```
+
+
+
+### 6. Work Interference vs Mental Health Benefits
+```{r}
+p_benefits_interfere <- mental_health %>%
+  filter(!is.na(tech_company), !is.na(work_interfere)) %>%
+  ggplot(aes(x = tech_company, fill = work_interfere)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Work Interference vs Mental Health Benefits",
+    x = "Company Provides Mental Health Benefits",
+    y = "Proportion",
+    fill = "Interference With Work"
+  )
+
+ggplotly(p_benefits_interfere)
+```
+
+### 7. Leave Policy vs Seeking Treatment
+```{r}
+p_leave_treatment <- mental_health %>%
+  filter(!is.na(leave), !is.na(treatment)) %>%
+  ggplot(aes(x = leave, fill = treatment)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Ease of Taking Leave vs Seeking Treatment",
+    x = "Perceived Ease of Taking Medical Leave",
+    y = "Proportion",
+    fill = "Sought Treatment"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p_leave_treatment)
+```
+
+### 8. Company Mental Health Resources vs Willingness to Talk to Supervisor
+```{r}
+p_resources_vs_supervisor <- mental_health %>%
+  filter(!is.na(care_options), !is.na(supervisor)) %>%
+  ggplot(aes(x = care_options, fill = supervisor)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Awareness of Mental Health Care Options vs Willingness to Talk to Supervisor",
+    x = "Aware of Mental Health Care Options",
+    y = "Proportion",
+    fill = "Would Talk to Supervisor"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p_resources_vs_supervisor)
+```
+
+
+## Big Idea
+Employers who provide strong workplace benefits—such as remote work flexibility, access to mental health resources, and supportive leave policies—create environments where employees are more likely to seek mental health treatment and report lower levels of work interference. This matters because untreated mental health issues not only harm individuals but also impact productivity, retention, and organizational culture. If companies recognize that supportive policies are not just perks but essential components of employee wellbeing, they can take actionable steps that improve both human and business outcomes.
+
+
+## Explanatory Visualizations
