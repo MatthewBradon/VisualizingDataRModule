@@ -1,6 +1,6 @@
 ---
 title: "CMPU4091 Visualizing Data Assignment"
-subtitle: "Tech companies with good benefits improve mental health of employees"
+subtitle: "Improved mental health policies improves productivity"
 author: "C21380786 Matthew Bradon"
 date: "`r Sys.Date()`"
 format:
@@ -37,7 +37,9 @@ The dataset used for is the analysis a 2014 Mental Health in Tech Survey found o
 
   - **care_options:** Do you know the options for mental health care your employer provides?
 
-  - **wellness_program:** Does your employer provide resources to learn more about mental health issues and how to seek help?
+  - **wellness_program:** Has your employer ever discussed mental health as part of an employee wellness program?
+
+  - **seek_help** Does your employer provide resources to learn more about mental health issues and how to seek help?
 
   - **anonymity:** Is your anonymity protected if you choose to take advantage of mental health or substance abuse treatment resources?
 
@@ -267,6 +269,10 @@ heatmaply(
 )
 ```
 
+Most of the moderate correlations have to do with company culture questions for example if your anonymity is protected in regards to mental health your company tends to support mental health related leave.
+
+
+
 ### 1. Treatment by Age Group
 ```{r}
 p3 <- ggplot(mental_health, aes(x = age_group, fill = treatment)) +
@@ -399,9 +405,148 @@ p_resources_vs_supervisor <- mental_health %>%
 ggplotly(p_resources_vs_supervisor)
 ```
 
+### Further exploratory with breakdown by age group and gender
+#### 1. Treatment by Gender and Age Group
+```{r}
+p1 <- ggplot(mental_health, aes(x = age_group, fill = treatment)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ gender) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Mental Health Treatment by Age Group and Gender",
+    x = "Age Group",
+    y = "Proportion",
+    fill = "Treatment Status"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p1)
+```
+
+#### 2. Work Interference by Gender and Age Group
+```{r}
+p2 <- ggplot(mental_health, aes(x = age_group, fill = work_interfere)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ gender) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Perceived Work Interference by Age Group and Gender",
+    x = "Age Group",
+    y = "Proportion",
+    fill = "Work Interference"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p2)
+```
+
+#### 3. Leave Policy vs Treatment by Gender
+```{r}
+p3 <- ggplot(mental_health, aes(x = leave, fill = treatment)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ gender) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Ease of Taking Leave vs Treatment, by Gender",
+    x = "Ease of Taking Leave",
+    y = "Proportion",
+    fill = "Treatment"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p3)
+```
+
+#### 4. Remote Work and Treatment by Age Group
+```{r}
+p4 <- ggplot(mental_health, aes(x = remote_work, fill = treatment)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ age_group) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Remote Work vs Treatment by Age Group",
+    x = "Remote Work",
+    y = "Proportion",
+    fill = "Treatment"
+  )
+
+ggplotly(p4)
+```
+
+
+
 
 ## Big Idea
 Employers who provide strong workplace benefits—such as remote work flexibility, access to mental health resources, and supportive leave policies—create environments where employees are more likely to seek mental health treatment and report lower levels of work interference. This matters because untreated mental health issues not only harm individuals but also impact productivity, retention, and organizational culture. If companies recognize that supportive policies are not just perks but essential components of employee wellbeing, they can take actionable steps that improve both human and business outcomes.
 
 
 ## Explanatory Visualizations
+Company policies have a small effect on whether an employee gets treated and treated employees report lower levels of intererence with work due to mental health.
+
+```{r}
+p1 <- mental_health %>%
+  filter(!is.na(treatment), !is.na(work_interfere)) %>%
+  ggplot(aes(x = treatment, fill = work_interfere)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1) +
+  labs(
+    title = "Work Interference by Mental Health Treatment Status",
+    subtitle = "Treated individuals report less frequent work interference",
+    x = "Treatment Status",
+    y = "Proportion",
+    fill = "Work Interference Frequency"
+  ) +
+  theme_minimal()
+
+ggplotly(p1)
+
+```
+
+```{r}
+p2 <- mental_health %>%
+  filter(!is.na(tech_company), !is.na(work_interfere), !is.na(gender)) %>%
+  ggplot(aes(x = tech_company, fill = work_interfere)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ gender) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1) +
+  labs(
+    title = "Impact of Company Mental Health Benefits on Work Interference",
+    subtitle = "Gender differences in how benefits affect mental health at work",
+    x = "Company Provides Mental Health Benefits",
+    y = "Proportion",
+    fill = "Work Interference"
+  ) +
+  theme_minimal()
+
+ggplotly(p2)
+
+```
+
+```{r}
+p3 <- mental_health %>%
+  filter(!is.na(leave), !is.na(work_interfere), !is.na(age_group)) %>%
+  ggplot(aes(x = leave, fill = work_interfere)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ age_group, ncol = 3) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1) +
+  labs(
+    title = "Work Interference Across Leave Policies by Age Group",
+    subtitle = "Younger workers are more affected by poor leave policies",
+    x = "Ease of Taking Leave for Mental Health",
+    y = "Proportion",
+    fill = "Work Interference"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(p3)
+
+```
+
+
+## Conclusion
+
+Company Mental Healty policies according to analysis of this 2014 survey have little to no effect on productivity.
