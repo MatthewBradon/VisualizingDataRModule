@@ -14,9 +14,9 @@ editor: visual
 
 ## Introduction
 
-Mental health has become an increasingly important topic in modern workplaces, especially in high-stress and fast-paced industries like technology. Employees in tech companies often face long hours, tight deadlines, and a culture that prizes productivity—conditions that can exacerbate mental health challenges. This project explores the relationship between workplace benefits and mental health outcomes for employees in the tech sector using real-world survey data.
+Mental health has become an increasingly important topic in modern workplaces. Employees in tech companies often face tight deadlines that can exacerbate mental health challenges. This project explores the relationship between workplace benefits and mental health outcomes for employees in the tech sector.
 
-The primary goal of this analysis is to determine whether supportive workplace policies such as remote work, access to mental health care options, wellness programs, and flexible leave policies correlate with improved mental health outcomes. Specifically, we examine whether these benefits increase the likelihood of employees seeking treatment and reduce self-reported work interference due to mental health conditions.
+The original goal of this analysis is to determine whether supportive workplace policies such as remote work, access to mental health care options, wellness programs, and flexible leave policies correlate with improved mental health outcomes. Specifically,  examing whether these benefits increase the likelihood of employees seeking treatment and reduce self-reported work interference due to mental health conditions. However what was found was negiligble proof and even contradictory evidence that mental health policies had an effect on mental health related work interference.
 
 
 The dataset used for is the analysis a 2014 Mental Health in Tech Survey found on kaggle (https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey). Transformations on gender and age were done, as well as an age group was added for better analysis.
@@ -155,6 +155,7 @@ for (col in names(mental_health)) {
 
 ```
 
+
 ### Country breakdown
 ```{r}
 # Count responses by country
@@ -199,10 +200,11 @@ p_bubble <- ggplot() +
 
 # Make interactive with proper tooltip
 ggplotly(p_bubble, tooltip = "label")
-
 ```
 
+
 59.6% of the survey responses come from the USA with United Kingdom (14.7) and Canada (5.7%) being the next two largest. This introduces bias as how americans interact with their mental health in the workplace may be different to how other european countries work as well as eastern countries.
+
 ### Age Distribution
 ```{r}
 p1 <- ggplot(mental_health, aes(x = age)) +
@@ -212,6 +214,7 @@ p1 <- ggplot(mental_health, aes(x = age)) +
        y = "Count")
 ggplotly(p1)
 ```
+
 
 Most of the dataset is people whos age range from 20 to 40. This means the tech sector is mostly young workers in their careers.
 
@@ -227,8 +230,8 @@ p2 <- ggplot(mental_health, aes(x = gender, fill = gender)) +
   ) +
   theme_minimal()
 ggplotly(p2)
-
 ```
+
 
 There is significantly more men than women in the dataset which is to be expected as tech is a male dominated field. 
 
@@ -250,7 +253,9 @@ cor_data <- mental_health %>%
     mental_health_consequence,
     phys_health_consequence,
     coworkers,
-    supervisor
+    supervisor,
+    mental_vs_physical,
+    obs_consequence
   ) %>%
   mutate(across(everything(), ~ as.numeric(as.factor(.))))  # convert all to numeric
 
@@ -269,6 +274,7 @@ heatmaply(
 )
 ```
 
+
 Most of the moderate correlations have to do with company culture questions for example if your anonymity is protected in regards to mental health your company tends to support mental health related leave.
 
 
@@ -285,6 +291,9 @@ p3 <- ggplot(mental_health, aes(x = age_group, fill = treatment)) +
 ggplotly(p3)
 ```
 
+
+This was suprising as my assumption would be the younger generations would get treated to mental health as its less stigmatized. But clearly see an increase in the proportion of those who get treated for mental health as the age group increases.
+
 ### 2. Treatment by Gender
 ```{r}
 p4 <- ggplot(mental_health, aes(x = gender, fill = treatment)) +
@@ -295,6 +304,9 @@ p4 <- ggplot(mental_health, aes(x = gender, fill = treatment)) +
   scale_y_continuous(labels = scales::percent_format())
 ggplotly(p4)
 ```
+
+
+I expected the number of treatment for mental health for the genders to be around the same with a slight edge in more females. However I did not expect that 23.76% more females get treated. The Other gender is at 90% however this includes some cis males and cis females and the sample size is 10 which is not enough to draw any real conclusions
 
 ### 3. Treatment by Country
 ```{r}
@@ -316,6 +328,9 @@ p5 <- ggplot(mental_health_top, aes(x = country, fill = treatment)) +
 ggplotly(p5)
 ```
 
+
+As discussed above the majority of the dataset belongs to the USA followed by the UK and Canada. They have similar ratios with the USA being 54.69% treated and 45.31% not treated. I did not expect that the majority would be treated for mental health.
+
 ### 4. Treatment vs Remote Work
 ```{r}
 p_remote_treatment <- mental_health %>%
@@ -333,26 +348,10 @@ p_remote_treatment <- mental_health %>%
 ggplotly(p_remote_treatment)
 ```
 
+
+No signifigant difference between the rate of being treated and remote work.
+
 ### 5. Work Interference vs Mental Health Benefits
-```{r}
-p_interference_treatment <- mental_health %>%
-  filter(!is.na(work_interfere), !is.na(treatment)) %>%
-  ggplot(aes(x = work_interfere, fill = treatment)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = "Treatment vs Work Interference",
-    x = "Work Interference",
-    y = "Proportion",
-    fill = "Sought Treatment"
-  )
-
-ggplotly(p_remote_treatment)
-```
-
-
-
-### 6. Work Interference vs Mental Health Benefits
 ```{r}
 p_benefits_interfere <- mental_health %>%
   filter(!is.na(tech_company), !is.na(work_interfere)) %>%
@@ -369,10 +368,20 @@ p_benefits_interfere <- mental_health %>%
 ggplotly(p_benefits_interfere)
 ```
 
-### 7. Leave Policy vs Seeking Treatment
+
+When a company has mental health benefits, employees who report Never grows by 2.3% and Often shrinks by 3.87%, Sometimes grows by 4.78% and Rarely shrinks by 3.2%. This suggests that there may be a slight improvement in work interference when a company has good mental health benefits
+
+### 6. Leave Policy vs Seeking Treatment
 ```{r}
 p_leave_treatment <- mental_health %>%
   filter(!is.na(leave), !is.na(treatment)) %>%
+  mutate(leave = factor(leave, levels = c(
+    "Don't know",
+    "Very difficult",
+    "Somewhat difficult",
+    "Somewhat easy",
+    "Very easy"
+  ))) %>%
   ggplot(aes(x = leave, fill = treatment)) +
   geom_bar(position = "fill") +
   scale_y_continuous(labels = scales::percent_format()) +
@@ -387,7 +396,10 @@ p_leave_treatment <- mental_health %>%
 ggplotly(p_leave_treatment)
 ```
 
-### 8. Company Mental Health Resources vs Willingness to Talk to Supervisor
+
+It is interesting to see that more people who get treated are in companies that find it hard to get mental health realted issues.
+
+### 7. Company Mental Health Resources vs Willingness to Talk to Supervisor
 ```{r}
 p_resources_vs_supervisor <- mental_health %>%
   filter(!is.na(care_options), !is.na(supervisor)) %>%
@@ -404,6 +416,9 @@ p_resources_vs_supervisor <- mental_health %>%
 
 ggplotly(p_resources_vs_supervisor)
 ```
+
+
+Employees are more willing to talk to their supervisors about mental health if they are aware of company mental health resources. This could be due to the company making their mental health care options clear. It does also stand that if an employee knows the company does not have mental health resources they would not discusss their issues with their supervisor.
 
 ### Further exploratory with breakdown by age group and gender
 #### 1. Treatment by Gender and Age Group
@@ -423,9 +438,13 @@ p1 <- ggplot(mental_health, aes(x = age_group, fill = treatment)) +
 ggplotly(p1)
 ```
 
+Above we explored mental health treatement by age group and gender individually and found it generally increased with age and females got treated more. It is expected when visualizing by age group and gender we see the exact same trend. What is interesting is the majority of females getting treated, there is little growth in treatment as age increases compared to the male counterpart.
+
 #### 2. Work Interference by Gender and Age Group
 ```{r}
-p2 <- ggplot(mental_health, aes(x = age_group, fill = work_interfere)) +
+p2 <- mental_health %>%
+  filter(!is.na(work_interfere), !is.na(age_group), !is.na(gender)) %>%
+  ggplot(aes(x = age_group, fill = work_interfere)) +
   geom_bar(position = "fill") +
   facet_wrap(~ gender) +
   scale_y_continuous(labels = scales::percent_format()) +
@@ -440,9 +459,20 @@ p2 <- ggplot(mental_health, aes(x = age_group, fill = work_interfere)) +
 ggplotly(p2)
 ```
 
+Besides the later age groups (which have less people seen in the age distribution) there does not seem to be a visible pattern to work interference and age group and gender
+
 #### 3. Leave Policy vs Treatment by Gender
 ```{r}
-p3 <- ggplot(mental_health, aes(x = leave, fill = treatment)) +
+p3 <- mental_health %>%
+  filter(!is.na(leave), !is.na(treatment), !is.na(gender)) %>%
+  mutate(leave = factor(leave, levels = c(
+    "Don't know",
+    "Very difficult",
+    "Somewhat difficult",
+    "Somewhat easy",
+    "Very easy"
+  ))) %>%
+  ggplot(aes(x = leave, fill = treatment)) +
   geom_bar(position = "fill") +
   facet_wrap(~ gender) +
   scale_y_continuous(labels = scales::percent_format()) +
@@ -452,10 +482,13 @@ p3 <- ggplot(mental_health, aes(x = leave, fill = treatment)) +
     y = "Proportion",
     fill = "Treatment"
   ) +
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggplotly(p3)
 ```
+
+As mentioned above there was the trend with the number of people treated seemed to decrease with the increase ease of mental health leave. However when viewed through the lens of gender we see this true for males but not for females.
 
 #### 4. Remote Work and Treatment by Age Group
 ```{r}
@@ -473,26 +506,51 @@ p4 <- ggplot(mental_health, aes(x = remote_work, fill = treatment)) +
 ggplotly(p4)
 ```
 
+Again remote work does not seem to have any effect on the proportion of treatment even when broken into age groups.
 
 
 
 ## Big Idea
-Employers who provide strong workplace benefits—such as remote work flexibility, access to mental health resources, and supportive leave policies—create environments where employees are more likely to seek mental health treatment and report lower levels of work interference. This matters because untreated mental health issues not only harm individuals but also impact productivity, retention, and organizational culture. If companies recognize that supportive policies are not just perks but essential components of employee wellbeing, they can take actionable steps that improve both human and business outcomes.
+Employers who provide strong mental health workplace benefits such as remote work, supportive leave and access to mental health resources create an environment where employees are more likely to seek mental health treatment and report lower levels of work interference. This is important as work interference effects productivity. Companies can take actionable step in the form of workplace policeis that improve both human and business outcomes.
+
+However from the exploration of the data, it has shown that supportive mental health policies had a negligible effect on workplace interference and likelihood of employee going for treatment. The below visualizations will show how these policies effect work interference.
 
 
 ## Explanatory Visualizations
-Company policies have a small effect on whether an employee gets treated and treated employees report lower levels of intererence with work due to mental health.
+From this analysis implemnting supportive mental health policies in a workplace has negligble effect on work interference related to mental health. 
 
+
+
+::::::: {.panel-fill layout="[ [1], [1,1] ]" style="max-width: 900px; margin: auto;"}
+:::::: panel-tabset
+
+### Work Interference by Treatment Status
+
+::: panel
 ```{r}
-p1 <- mental_health %>%
+
+p1_data <- mental_health %>%
   filter(!is.na(treatment), !is.na(work_interfere)) %>%
-  ggplot(aes(x = treatment, fill = work_interfere)) +
-  geom_bar(position = "fill") +
+  group_by(treatment, work_interfere) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(treatment) %>%
+  mutate(total = sum(n),
+         prop = n / total,
+         se = sqrt(prop * (1 - prop) / total),
+         ci_low = prop - 1.96 * se,
+         ci_high = prop + 1.96 * se)
+
+# Plot
+p1 <- ggplot(p1_data, aes(x = treatment, y = prop, fill = work_interfere)) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high),
+                position = position_dodge(width = 0.9),
+                width = 0.2) +
   scale_y_continuous(labels = scales::percent_format()) +
   scale_fill_brewer(palette = "RdYlBu", direction = -1) +
   labs(
     title = "Work Interference by Mental Health Treatment Status",
-    subtitle = "Treated individuals report less frequent work interference",
+    subtitle = "With 95% confidence intervals for each group",
     x = "Treatment Status",
     y = "Proportion",
     fill = "Work Interference Frequency"
@@ -500,20 +558,42 @@ p1 <- mental_health %>%
   theme_minimal()
 
 ggplotly(p1)
-
 ```
 
+**Interpretation:**  
+Employees who are receiving mental health treatement are much more likely to have work interference due to mental health. 50.4% of not treated employees never have work interference while only 5 percent of treated employees never have work interference due to mental health. My intuition would be that people who are being treated for mental health would be less likely to have mental health work interference. However people who arent being treated for mental health may not have mental health problems and it would make sense that they would not have interference if they did not have mental health problems. Also people who are being treated for mental health do have mental health problems and it that cohourt of the sample would have more mental health related work interference. For better analysis surveying people who have mental issues
+:::
+
+---
+
+### Company Benefits and Gender Differences
+
+::: panel
 ```{r}
-p2 <- mental_health %>%
+p2_data <- mental_health %>%
   filter(!is.na(tech_company), !is.na(work_interfere), !is.na(gender)) %>%
-  ggplot(aes(x = tech_company, fill = work_interfere)) +
-  geom_bar(position = "fill") +
+  filter(gender != "Other") %>%  # Exclude "Other" gender category
+  group_by(gender, tech_company, work_interfere) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(gender, tech_company) %>%
+  mutate(total = sum(n),
+         prop = n / total,
+         se = sqrt(prop * (1 - prop) / total),
+         ci_low = prop - 1.96 * se,
+         ci_high = prop + 1.96 * se)
+
+# Plot with facets
+p2 <- ggplot(p2_data, aes(x = tech_company, y = prop, fill = work_interfere)) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high),
+                position = position_dodge(width = 0.9),
+                width = 0.2) +
   facet_wrap(~ gender) +
   scale_y_continuous(labels = scales::percent_format()) +
   scale_fill_brewer(palette = "RdYlBu", direction = -1) +
   labs(
     title = "Impact of Company Mental Health Benefits on Work Interference",
-    subtitle = "Gender differences in how benefits affect mental health at work",
+    subtitle = "Includes 95% CI; grouped by gender and company benefit",
     x = "Company Provides Mental Health Benefits",
     y = "Proportion",
     fill = "Work Interference"
@@ -521,12 +601,28 @@ p2 <- mental_health %>%
   theme_minimal()
 
 ggplotly(p2)
-
 ```
 
+**Interpretation:**  
+This graph shows how company benefits and work interference relate to each other broken down by gender. An interesting fact to note is that uncertainty for the females is much higher than it is for males. This could be due to females make up 19.74% of the survey and with a 4 times smaller sample size introducing more uncertainty. In data exploration we saw that there was a very slight improvement in work interference when there are mental health benefits. But when account for uncertainty and doing a breakdown by gender that improvement seems to be negligble. It is interesting that for females, work interference appears to be worse with those who report Never decreasing by 5.1%. Males however appear to report less work interference with the mental health benefits. Due to the very small improvements and the large amount of uncertainty when broken down by gender I cannot conclude that work place benefits effect work interference.
+:::
+
+---
+
+### Leave Policy Impact by Age Group
+
+::: panel
 ```{r}
 p3 <- mental_health %>%
   filter(!is.na(leave), !is.na(work_interfere), !is.na(age_group)) %>%
+  filter(!age_group %in% c("16–20", "60+")) %>%
+  mutate(leave = factor(leave, levels = c(
+    "Don't know",
+    "Very difficult",
+    "Somewhat difficult",
+    "Somewhat easy",
+    "Very easy"
+  ))) %>%
   ggplot(aes(x = leave, fill = work_interfere)) +
   geom_bar(position = "fill") +
   facet_wrap(~ age_group, ncol = 3) +
@@ -540,13 +636,22 @@ p3 <- mental_health %>%
     fill = "Work Interference"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    panel.spacing = unit(1.5, "lines")
+  )
 
 ggplotly(p3)
-
 ```
+
+**Interpretation:**  
+In this visualization some of the age groups were excluded due to the very small sample size. Across each age group there is no discernable pattern amerging. The proportion of those who report never appears to grow larger as taking leave becomes easier but in some age groups so does the proportion of Often. This could just be random noise and not an actual pattern in the dataset.
+
+:::
+
+::::::
+:::::::
 
 
 ## Conclusion
-
-Company Mental Healty policies according to analysis of this 2014 survey have little to no effect on productivity.
+In conclusion, I set out to see how mental health polices reduce work intereference due to mental health however found that it did not have an effect signifigant enough to definitvely say. We did a breakdown by age group and gender which gave a deeper insight such as how benefits vs interference in a single variate analysis showed a slight increase but through the lens of gender the improvement vanished.
