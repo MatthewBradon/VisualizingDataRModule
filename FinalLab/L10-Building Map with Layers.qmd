@@ -1,0 +1,368 @@
+---
+title: "L10-Build Map With Layers"
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc_float: true
+    toc-location: left
+editor: source
+---
+
+# Building a map with layers
+
+This document demonstrates how to build a layered map of Ireland using R. It walks through the process of visualizing geographic data by adding multiple layers such as:
+
+* A base map of Ireland
+
+* Major cities and a route between them
+
+* County boundaries from GADM data
+
+* Socioeconomic data, specifically median household income per county
+
+Using a combination of packages including sf, ggplot2::ggplot2, and ggspatial, this example illustrates how to read and manipulate spatial data, enrich it with external attribute data, and visualize it clearly and effectively.
+
+The mapping process also includes the application of appropriate coordinate reference systems (CRS), with a focus on reprojecting data to the Irish Transverse Mercator (EPSG:2157) for scale accuracy. In addition, alternate projections are explored—including Lambert Conformal Conic and Azimuthal Equidistant—to highlight how different CRSs affect map representation.
+
+At the end of the document, a series of cartograms are created to visualize income data in a more interpretive way. These include:
+
+* Non-contiguous cartograms, which scale and reposition counties based on income,
+
+* Contiguous cartograms, which warp county shapes to reflect income values, and
+
+* Dorling cartograms, which use non-overlapping circles sized by income.
+
+
+```{r setup}
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+quiet_library("ggplot2")
+quiet_library("sf")               # For handling spatial data
+quiet_library("ggspatial")        # Facilitates adding map elements to ggplot2::ggplot2
+quiet_library("rnaturalearth")    # Provides world map data
+quiet_library("rnaturalearthdata") 
+quiet_library("geojsonio")        # For reading geo json data
+quiet_library("tidyverse")
+quiet_library("ggrepel")          # For labelling and annotation
+
+
+mydata <- file.path("C:","Datasets")
+```
+
+# Base Map
+```{r basemap}
+# setup the data for Ireland
+ireland <- rnaturalearth::ne_countries(scale = "medium", country = "Ireland", returnclass = "sf")
+
+# Create the basic map
+ggplot2::ggplot(data = ireland) +
+  geom_sf(fill = "lightgreen", color = "darkblue") +
+  theme_minimal()
+
+```
+# Overlays
+## Overlay cities
+```{r plotcities}
+# Setup dataframe with longitude and latitude of major cities
+cities <- data.frame(
+  name = c("Dublin", "Cork", "Limerick", "Galway"),
+  lon = c(-6.2603, -8.472, -8.6305, -9.0568),
+  lat = c(53.3498, 51.8985, 52.6680, 53.2707)
+)
+# Plot
+ggplot2::ggplot(data = ireland) +
+  geom_sf(fill = "lightgreen", color = "darkblue") + 
+  geom_point(data = cities, aes(x = lon, y = lat), color = "red", size = 3) +
+  geom_text_repel(data = cities, aes(x = lon, y = lat, label = name), vjust = -1) +
+  theme_minimal()
+
+```
+## Add a scale bar and compass direction
+```{r addscale}
+ggplot2::ggplot(data = ireland) +
+  geom_sf(fill = "lightgreen", color = "darkblue") + 
+  geom_point(data = cities, aes(x = lon, y = lat), color = "red", size = 3) +
+  geom_text_repel(data = cities, aes(x = lon, y = lat, label = name), vjust = -1) +
+  annotation_scale(location = "bl", width_hint = 0.5) + 
+  annotation_north_arrow(location = "tl", which_north = "true", style = north_arrow_fancy_orienteering) +
+  theme_minimal()
+
+```
+## Overlay County Boundaries
+Using data from GADM (Global Administrative Areas) a spatial database of the world's administrative boundaries (e.g., countries, states, counties, municipalities) to add a layer of county boundaries. GADM provides detailed shapefiles that can be used to create the layer. We are uaing the **geojson** file. We will use **geojsonio** to read the file. We then need to do some manipulation and convert it to a spatial vector so we can overlay it on the map.
+GADM provides different levels of administrative boundaries, depending on the country.
+For Ireland, the structure is:
+
+Level 0 = Country (Ireland)
+
+Level 1 = Counties (e.g., Dublin, Cork, Galway)
+
+Level 2 = Electoral Divisions (EDs) or equivalent sub-county divisions
+
+Download from: https://gadm.org/download_country.html
+
+```{r plotcounty}
+# Using the shape data downloaded from 
+# Replace this with your actual file path
+json_file <- file.path(mydata, "gadm41_IRL_1.json")
+                       
+# Read the GeoJSON file into an sf object
+countyshapes <- sf::st_read(json_file)
+
+
+# Replace NAME_1 with "Cork" where VARNAME_1 is "Corcaigh"
+# For some reason some Cork data is NA for NAME_1 but has the Irish equivalen
+countyshapes$NAME_1[countyshapes$VARNAME_1 == "Corcaigh"] <- "Cork"
+
+# Overlay county shapes on base map
+ggplot2::ggplot() +
+  # Ireland base map
+  geom_sf(data = ireland, fill = "lightgreen", color = "darkblue") +
+  
+  # County boundaries
+  geom_sf(data = countyshapes, fill = NA, color = "blue", size = 0.5) +
+  
+  # Customizations
+  theme_minimal() +
+  ggtitle("Ireland with County Boundaries")
+
+cities <- data.frame(
+  name = c("Dublin", "Cork", "Limerick", "Galway"),
+  lon = c(-6.2603, -8.472, -8.6305, -9.0568),
+  lat = c(53.3498, 51.8985, 52.6680, 53.2707)
+)
+# Enhance with layer of cities, scale bar etc
+ggplot2::ggplot() +
+  geom_sf(data = ireland, fill = "lightgreen", color = "darkblue") +
+  geom_sf(data = countyshapes, fill = NA, color = "blue", size = 0.5) +
+  geom_point(data = cities, aes(x = lon, y = lat), color = "red", size = 3) +
+  geom_text_repel(data = cities, aes(x = lon, y = lat, label = name), vjust = -1) +
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "tl", which_north = "true", style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Ireland with County Boundaries and Major Cities")
+
+```
+
+## Overlay Route
+```{r route}
+# Ireland base map
+ggplot2::ggplot() +
+  geom_sf(data = ireland, fill = "lightgreen", color = "darkblue") +
+  geom_sf(data = countyshapes, fill = NA, color = "blue", size = 0.5) +
+
+  # Cities Data
+  geom_point(data = cities, aes(x = lon, y = lat), color = "red", size = 3) +
+  geom_text_repel(data = cities, aes(x = lon, y = lat, label = name), vjust = -1) +
+
+  # Add a curved line from Dublin to Galway
+  geom_curve(aes(x = -6.2603, y = 53.3498, xend = -9.0568, yend = 53.2707),
+             curvature = 0.2, color = "purple", linewidth = 1, 
+             arrow = arrow(length = unit(0.15, "inches"))) +
+
+  # Scale bar and north arrow
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "tl", which_north = "true", style = north_arrow_fancy_orienteering) +
+
+  # Theme and title
+  theme_minimal() +
+  ggtitle("Ireland + County Boundaries + Major Cities  + Route")
+```
+
+## Overlay with Income Data for each County
+
+Using data from the CSO which gives median income per electoral district, summarise to get the median income per county and then overlay on the map.
+
+```{r plotincome}
+# Read in a file from CSO data of median income per electoral region
+incomeloc <-file.path(mydata,"MedianIncomeIreland.csv" )
+countyincome <-read.csv(incomeloc) 
+
+# Using a regular expression, extract county name after "Co." or Ending with Dublin, Cork City or Tipperary and add to the same dataset as column county
+countyincome$county <- str_extract(countyincome$Electoral.Division, 
+                                      "(?<=Co\\. )\\w+|Dublin$|Cork City$|Tipperary$")
+
+# Regular Expression explanation:
+# (?<=Co\. )\w+ - This is a lookbehind (?<=...), which ensures that the match only occurs if it is preceded by "Co. " (e.g., "Co. Mayo").
+# \w+ matches one or more word characters (letters, numbers, or underscores), so it captures county names like "Mayo", "Galway", etc., after "Co. ".
+# The | means OR.
+# Dublin$ matches "Dublin" only if it appears at the end of the string ($ means end of the string).
+# Cork City$ Matches "Cork City" only if it appears at the end of the string.
+#  Tipperary$ Matches "Tipperary" only if it appears at the end of the string.
+
+# Replace Cork City by Cork
+countyincome <- countyincome %>%
+  mutate(county = case_when(
+    county == "Cork City" ~ "Cork",
+    TRUE ~ county
+  ))
+# Rename column "VALUE" to "avg_income"
+countyincome <- countyincome %>%
+  rename(mdn_income = VALUE)
+countyincome <- na.omit(countyincome)
+
+# Summarize avg_income by county_name, omitting nas
+summary_df <- na.omit(countyincome) %>%
+  group_by(county) %>%
+  summarize(mdn_income = median(mdn_income, na.rm = TRUE))
+
+
+# Merge income data with spatial county boundaries
+counties_income <- countyshapes %>%
+  inner_join(summary_df, by = c("NAME_1" = "county")) %>% # Ensure column names match
+  st_as_sf()  # Ensure it remains a spatial object with geometry
+
+# Plot Map with Income Data, Boundaries, and Cities
+ggplot2::ggplot() +
+  # Base Ireland map
+  geom_sf(data = ireland, fill = "lightgreen", color = "darkblue") +
+  
+  # County boundaries
+  geom_sf(data = countyshapes, fill = NA, color = "blue", size = 0.5) +
+  
+  # Income overlay
+  geom_sf(data = counties_income, aes(fill = mdn_income), color = "darkblue") +
+  scale_fill_viridis_c(name = "Median Income (€)", na.value = "grey50") + 
+  
+  # Cities layer
+  geom_point(data = cities, aes(x = lon, y = lat), color = "red", size = 3) +
+  geom_text_repel(data = cities, aes(x = lon, y = lat, label = name), vjust = -1) +
+  
+  # Scale bar and compass
+  annotation_scale(location = "bl", width_hint = 0.5) +
+  annotation_north_arrow(location = "tl", which_north = "true", style = north_arrow_fancy_orienteering) +
+  
+  # Theme and title
+  theme_minimal() +
+  ggtitle("Median Income by County in Ireland")
+
+```
+
+Note: The scale issue arises because Ireland's shape is not perfectly uniform in a simple projected coordinate system, which can distort the accuracy of the scale bar.
+This is a projection distortion. You need to choose an appropriate co-ordinate system. The Irish Transverse Mercator (EPSG:2157) is the best choice for Ireland.
+
+## Irish Traverse Mercator Projection
+```{r reprojecttm}
+# Define a new projection (Irish Traverse Mercator)
+crs_itransm <- 2157
+
+# Reproject all spatial data
+ireland_proj <- sf::st_transform(ireland, crs_itransm)
+counties_proj <- sf::st_transform(countyshapes, crs_itransm)
+counties_income_proj <- sf::st_transform(counties_income, crs_itransm)
+
+# Convert city coordinates to projected CRS
+cities_proj <- cities %>%
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 2157) %>% 
+  sf::st_transform(crs_itransm) %>% 
+  sf::st_coordinates() %>%
+  as.data.frame() %>%
+  mutate(name = cities$name) 
+
+# Plot using the new projection
+ggplot2::ggplot() +
+  geom_sf(data = ireland_proj, fill = "lightgreen", color = "darkblue") +
+  geom_sf(data = counties_proj, fill = NA, color = "blue", size = 0.5) +
+  geom_sf(data = counties_income_proj, aes(fill = mdn_income), color = "darkblue") +
+  scale_fill_viridis_c(name = "Median Income (€)", na.value = "grey50") + 
+  geom_point(data = cities_proj, aes(x = X, y = Y), color = "red", size = 3) +
+  geom_text_repel(data = cities_proj, aes(x = X, y = Y, label = name), vjust = -1) +
+  annotation_scale(location = "bl", width_hint = 0.5, unit_category = "metric", 
+                   bar_cols = c("darkblue", "white")) +
+  annotation_north_arrow(location = "tl", which_north = "true", 
+                         style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Median Income by County in Ireland (ITM Projection)")
+
+
+```
+
+
+
+# Alternate Map Projections
+
+## Lambert Projection
+```{r reprojectlam}
+# Define a new projection (Lambert Conformal Conic)
+crs_lambert <- 3035
+
+# Reproject all spatial data
+ireland_proj <- sf::st_transform(ireland, crs_lambert)
+counties_proj <- sf::st_transform(countyshapes, crs_lambert)
+counties_income_proj <- sf::st_transform(counties_income, crs_lambert)
+
+# Convert city coordinates to projected CRS
+cities_proj <- cities %>%
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%    # Start with WGS84
+  sf::st_transform(crs = crs_lambert) %>%                   # Project to Lambert
+  sf::st_coordinates() %>%                                  # Extract coordinates
+  as.data.frame() %>%
+  mutate(name = cities$name)                            # Reattach city names
+
+
+# Plot using the new projection
+ggplot2::ggplot() +
+  geom_sf(data = ireland_proj, fill = "lightgreen", color = "darkblue") +
+  geom_sf(data = counties_proj, fill = NA, color = "blue", size = 0.5) +
+  geom_sf(data = counties_income_proj, aes(fill = mdn_income), color = "darkblue") +
+  scale_fill_viridis_c(name = "Median Income (€)", na.value = "grey50") + 
+  geom_point(data = cities_proj, aes(x = X, y = Y), color = "red", size = 3) +
+  geom_text_repel(data = cities_proj, aes(x = X, y = Y, label = name), vjust = -1) +
+  annotation_scale(location = "bl", width_hint = 0.5, unit_category = "metric", 
+                   bar_cols = c("darkblue", "white")) +
+  annotation_north_arrow(location = "tl", which_north = "true", 
+                         style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Median Income by County in Ireland (Lambert Projection)")
+
+
+```
+## Azimuthal Projection
+```{r reprojectaz}
+# Define Azimuthal Equidistant projection
+crs_azimuthal <- 3413  # North Pole-centered
+
+# Reproject spatial data
+ireland_proj <- sf::st_transform(ireland, crs_azimuthal)
+counties_proj <- sf::st_transform(countyshapes, crs_azimuthal)
+counties_income_proj <- sf::st_transform(counties_income, crs_azimuthal)
+
+# Convert city coordinates to projected CRS
+cities_proj <- cities %>%
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+  sf::st_transform(crs_azimuthal) %>% 
+  sf::st_coordinates() %>%
+  as.data.frame() %>%
+  mutate(name = cities$name) 
+
+# Plot the map using Azimuthal Equidistant projection
+ggplot2::ggplot() +
+  geom_sf(data = ireland_proj, fill = "lightgreen", color = "darkblue") +
+  geom_sf(data = counties_proj, fill = NA, color = "blue", size = 0.5) +
+  geom_sf(data = counties_income_proj, aes(fill = mdn_income), color = "darkblue") +
+  scale_fill_viridis_c(name = "Median Income (€)", na.value = "grey50") + 
+  geom_point(data = cities_proj, aes(x = X, y = Y), color = "red", size = 3) +
+  geom_text_repel(data = cities_proj, aes(x = X, y = Y, label = name), vjust = -1) +
+  annotation_scale(location = "bl", width_hint = 0.5, unit_category = "metric", 
+                   bar_cols = c("darkblue", "white")) +
+  annotation_north_arrow(location = "tl", which_north = "true", 
+                         style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Median Income by County in Ireland (Azimuthal Projection)")
+
+
+
+```
+
+
+

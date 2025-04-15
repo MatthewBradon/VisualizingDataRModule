@@ -1,0 +1,211 @@
+---
+title: "L10-Basic Maps and Geocoding"
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc_float: true
+    toc-location: left
+editor: source
+---
+
+
+This includes examples of rendering basic dot, bubble, line and flow maps using various R packages and reverse Geocoding using Open Street Map to render landmarks.
+It also includes an example of using different co-ordinate systems to render different projections of maps using various R packages.
+
+```{r setup}
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+quiet_library("ggplot2")
+quiet_library("tidyverse")
+quiet_library("sf")               # For handling spatial data
+quiet_library("rnaturalearth")    # Provides world map data
+quiet_library("rnaturalearthdata") 
+quiet_library("tidygeocoder")     #uses OpenStreetMap's Nominatim API or other providers.
+quiet_library("tmaptools") #tools for handling spatial data, particularly for cartographic visualization and geospatial analysis
+quiet_library("geosphere") # For route mapping in flow map
+```
+
+# World Map Showing Major European Cities
+
+```{r worldmap}
+# Load world map as an sf object
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+# Sample dataset: Cities with lat/lon
+city_data <- data.frame(
+  city = c("London", "Paris", "Berlin", "Madrid", "Rome"),
+  lon = c(-0.1278, 2.3522, 13.4050, -3.7038, 12.4964),
+  lat = c(51.5074, 48.8566, 52.5200, 40.4168, 41.9028)
+)
+
+# Convert to spatial object
+city_points <- sf::st_as_sf(city_data, coords = c("lon", "lat"), crs = 4326)
+
+# Render the plot
+ggplot2::ggplot() +
+  geom_sf(data = world, fill = "lightgray", color = "black") +  # Base map
+  geom_sf(data = city_points, aes(color = city), size = 3) +    # Add dots
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +  
+  labs(title = "Dot Map of Selected Cities in Europe",
+       subtitle = "Each dot represents a city",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal()
+```
+
+# Map of Ireland with Featured Landmarks
+
+```{r IRLmap}
+# Create a dataframe with updated landmarks and their coordinates
+landmarks <- data.frame(
+  name = c("St. Stephen's Green", "Patrick's Hill", "Eyre Square"),
+  city = c("Dublin", "Cork", "Galway"),
+  lat = c(53.3369, 51.9021, 53.2743),
+  lon = c(-6.2591, -8.4682, -9.0495)
+)
+# Load a map of Ireland from workd data
+ireland <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf", country = "Ireland")
+
+# Plot the map
+ggplot2::ggplot() +
+  geom_sf(data = ireland, fill = "lightgray", color = "black") +  # Base map
+  geom_point(data = landmarks, aes(x = lon, y = lat, color = city), size = 4) +  # Landmarks
+  geom_text(data = landmarks, aes(x = lon, y = lat, label = name), vjust = -1, size = 4) +  # Labels
+  theme_minimal() +
+  labs(title = "Major Landmarks in Ireland", x = "Longitude", y = "Latitude") +
+  scale_color_manual(values = c("Dublin" = "light blue", "Cork" = "red", "Galway" = "maroon"))
+```
+
+# Reverse Geocoding
+
+```{r revergeo}
+# Reverse Geocoding
+# Locations names
+locations <- data.frame(
+  name = c("Newgrange", "Eiffel Tower", "Big Ben", "Colosseum"),
+  address = c("Newgrange, Meath, Ireland",
+              "Eiffel Tower, Paris, France", 
+              "Big Ben, London, UK", 
+              "Colosseum, Rome, Italy")
+)
+
+# Retrieve the geocode information
+geocoded_data <- locations %>%
+  tidygeocoder::geocode(address, method = "osm")  # Uses OpenStreetMap's Nominatim API
+
+# Load world map data
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf", continent="Europe")
+
+# Create the map
+ggplot2::ggplot(data = world) +
+  geom_sf(fill = "antiquewhite", color = "gray40") +  # Base map with outlines
+  geom_point(data = geocoded_data, aes(x = long, y = lat, color = name), 
+             size = 4, alpha = 0.8) +  # Plot geocoded locations
+  geom_text(data = geocoded_data, aes(x = long, y = lat, label = name), 
+            nudge_y = 0.8, size = 4, fontface = "bold", color = "black") +  # Add labels
+  labs(title = "Landmark Locations in Europe",
+       subtitle = "Geocoded locations of famous landmarks",
+       x = "Longitude", y = "Latitude") +
+  coord_sf(xlim = c(-15, 40), ylim = c(35, 60), expand = FALSE) +  # Focus on Europe
+  theme_minimal()
+
+```
+
+# Line Map
+```{r linemap}
+# Coordinates of Dublin, Galway, and Cork
+cities <- data.frame(
+  name = c("Dublin", "Galway", "Cork"),
+  lat = c(53.349805, 53.2743, 51.8985),  # Latitude for Dublin, Galway, Cork
+  lon = c(-6.26031, -9.0495, -8.4725)    # Longitude for Dublin, Galway, Cork
+)
+
+# Convert cities to sf object (use WGS84 by default, EPSG:4326)
+cities_sf <- sf::st_as_sf(cities, coords = c("lon", "lat"), crs = 4326)
+
+# Create the routes (lines) from Dublin to Galway and Dublin to Cork
+# Ensure the coordinates are numeric and properly passed as coordinate pairs
+routes_sf <- sf::st_sfc(
+  st_linestring(matrix(c(-6.26031, 53.349805, -9.0495, 53.2743), ncol = 2, byrow = TRUE)),  # Dublin to Galway
+  st_linestring(matrix(c(-6.26031, 53.349805, -8.4725, 51.8985), ncol = 2, byrow = TRUE)),  # Dublin to Cork
+  crs = 4326  # Use WGS84 projection (EPSG:4326)
+)
+
+# Create a map of Ireland using rnaturalearth (in WGS84)
+ireland <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>%
+  filter(name == "Ireland")  # Filter for Ireland only
+
+# Extract the coordinates for label placement
+cities_sf <- cities_sf %>%
+  mutate(
+    x = st_coordinates(cities_sf)[, 1],  # Extract x (longitude)
+    y = st_coordinates(cities_sf)[, 2]   # Extract y (latitude)
+  )
+
+# Create the map with routes from Dublin to Galway and Cork
+ggplot2::ggplot() +
+  geom_sf(data = ireland, fill = "lightblue", color = "gray40") +  # Ireland base map in WGS84
+  geom_sf(data = routes_sf, aes(color = "Route"), size = 1.5) +  # Add routes (lines)
+  geom_sf(data = cities_sf %>% filter(name == "Dublin"), aes(color = "Dublin"), size = 4, shape = 21, fill = "red") +  # Dublin as red
+  geom_sf(data = cities_sf %>% filter(name == "Galway"), aes(color = "Galway"), size = 4, shape = 21, fill = "green") +  # Galway as green
+  geom_sf(data = cities_sf %>% filter(name == "Cork"), aes(color = "Cork"), size = 4, shape = 21, fill = "orange") +  # Cork as orange
+  geom_text(data = cities_sf, aes(x = x, y = y, label = name), nudge_y = 0.05, size = 4, fontface = "bold", color = "black") +  # Add city names
+  labs(title = "Routes from Dublin to Galway and Cork",
+       subtitle = "Using WGS84 (EPSG:4326) Projection",
+       x = "Longitude", y = "Latitude") +
+  scale_color_manual(values = c("Route" = "blue", "Dublin" = "red", "Galway" = "green", "Cork" = "orange")) +  # Set colors for routes and cities
+  coord_sf(expand = FALSE) +  # Adjust for WGS84 projection
+  theme_minimal()
+
+```
+# Flow Map
+```{r flowmap}
+# Coordinates of Dublin, Galway, and Cork
+cities <- data.frame(
+  name = c("Dublin", "Galway", "Cork"),
+  lat = c(53.349805, 53.2743, 51.8985),  # Latitude for Dublin, Galway, Cork
+  lon = c(-6.26031, -9.0495, -8.4725)    # Longitude for Dublin, Galway, Cork
+)
+
+# Convert cities to sf object (use WGS84 by default, EPSG:4326)
+cities_sf <- sf::st_as_sf(cities, coords = c("lon", "lat"), crs = 4326)
+
+# Create the routes (curved lines) from Dublin to Galway and Dublin to Cork
+routes_sf <- data.frame(
+  from = c("Dublin", "Dublin"),
+  to = c("Galway", "Cork"),
+  color = c("blue", "red"),
+  xend = c(-9.0495, -8.4725),
+  yend = c(53.2743, 51.8985)
+)
+
+# Create a map of Ireland using rnaturalearth (in WGS84)
+ireland <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf") %>%
+  filter(name == "Ireland")  # Filter for Ireland only
+
+# Create the flow map with curved lines and arrows
+ggplot2::ggplot() +
+  geom_sf(data = ireland, fill = "lightblue", color = "gray40") +  # Ireland base map in WGS84
+  geom_curve(data = routes_sf, aes(x = -6.26031, y = 53.349805, xend = xend, yend = yend, color = color), 
+             curvature = 0.2, alpha = 0.6, linewidth = 1, 
+             arrow = arrow(length = unit(0.15, "inches"))) +  # Curved flow lines with arrows
+  geom_sf(data = cities_sf %>% filter(name == "Dublin"), aes(color = "Dublin"), size = 4, shape = 21, fill = "black") +  # Dublin point
+  geom_sf(data = cities_sf %>% filter(name == "Galway"), aes(color = "Galway"), size = 4, shape = 21, fill = "green") +  # Galway point
+  geom_sf(data = cities_sf %>% filter(name == "Cork"), aes(color = "Cork"), size = 4, shape = 21, fill = "orange") +  # Cork point
+  scale_color_manual(values = c("blue", "red", "Dublin" = "black", "Galway" = "green", "Cork" = "orange")) +  # Set colors for flow and cities
+  labs(title = "Flow Map with Directed Curved Routes",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+

@@ -1,0 +1,305 @@
+---
+title: "L10-Interactivity"
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc_float: true
+    toc-location: left
+editor: source
+---
+
+# Adding interactivity
+
+This document demonstrates how to use the leaflet package to create interactive web maps and use animated transitions to enhance visual storytelling.
+
+
+```{r setup}
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+quiet_library("ggplot2")
+quiet_library("sf")               # For handling spatial data
+quiet_library("ggspatial")        # Facilitates adding map elements to ggplot2
+quiet_library("rnaturalearth")    # Provides world map data
+quiet_library("rnaturalearthdata") 
+quiet_library("geojsonio")        # For reading geo json data
+quiet_library("leaflet")          # For interactivity in maps
+quiet_library("magick")          # For swipe
+quiet_library("tidyverse")
+quiet_library("viridisLite")  # for consistent viridis palette
+quiet_library("geosphere")      # For adding a route
+
+mydata <- file.path("C:","Datasets")
+```
+
+# Base Map
+```{r basemap}
+# setup the data for Ireland
+ireland <-  rnaturalearth::ne_countries(scale = "medium", country = "Ireland", returnclass = "sf")
+
+# Setup dataframe with longitude and latitude of major cities
+cities <- data.frame(
+  name = c("Dublin", "Cork", "Limerick", "Galway"),
+  lon = c(-6.2603, -8.472, -8.6305, -9.0568),
+  lat = c(53.3498, 51.8985, 52.6680, 53.2707)
+)
+
+# Using the shape data downloaded from 
+# Replace this with your actual file path
+json_file <- file.path(mydata, "gadm41_IRL_1.json")
+                       
+# Read the GeoJSON file into an sf object
+countyshapes <- sf::st_read(json_file)
+
+
+# Replace NAME_1 with "Cork" where VARNAME_1 is "Corcaigh"
+# For some reason some Cork data is NA for NAME_1 but has the Irish equivalen
+countyshapes$NAME_1[countyshapes$VARNAME_1 == "Corcaigh"] <- "Cork"
+
+
+
+# Read in a file from CSO data of median income per electoral region
+incomeloc <-file.path(mydata,"MedianIncomeIreland.csv" )
+countyincome <-read.csv(incomeloc) 
+
+# Using a regular expression, extract county name after "Co." or Ending with Dublin, Cork City or Tipperary and add to the same dataset as column county
+countyincome$county <- stringr::str_extract(countyincome$Electoral.Division, 
+                                      "(?<=Co\\. )\\w+|Dublin$|Cork City$|Tipperary$")
+
+# Regular Expression explanation:
+# (?<=Co\. )\w+ - This is a lookbehind (?<=...), which ensures that the match only occurs if it is preceded by "Co. " (e.g., "Co. Mayo").
+# \w+ matches one or more word characters (letters, numbers, or underscores), so it captures county names like "Mayo", "Galway", etc., after "Co. ".
+# The | means OR.
+# Dublin$ matches "Dublin" only if it appears at the end of the string ($ means end of the string).
+# Cork City$ Matches "Cork City" only if it appears at the end of the string.
+#  Tipperary$ Matches "Tipperary" only if it appears at the end of the string.
+
+# Replace Cork City by Cork
+countyincome <- countyincome %>%
+  mutate(county = case_when(
+    county == "Cork City" ~ "Cork",
+    TRUE ~ county
+  ))
+# Rename column "VALUE" to "avg_income"
+countyincome <- countyincome %>%
+  rename(mdn_income = VALUE)
+countyincome <- na.omit(countyincome)
+
+# Summarize avg_income by county_name, omitting nas
+summary_df <- na.omit(countyincome) %>%
+  group_by(county) %>%
+  summarize(mdn_income = median(mdn_income, na.rm = TRUE))
+
+
+# Merge income data with spatial county boundaries
+counties_income <- countyshapes %>%
+  inner_join(summary_df, by = c("NAME_1" = "county")) %>% # Ensure column names match
+  st_as_sf()  # Ensure it remains a spatial object with geometry
+# Define a new projection (Irish Traverse Mercator)
+crs_itransm <- 2157
+
+# Reproject all spatial data
+ireland_proj <- sf::st_transform(ireland, crs_itransm)
+counties_proj <- sf::st_transform(countyshapes, crs_itransm)
+counties_income_proj <- sf::st_transform(counties_income, crs_itransm)
+
+# Convert city coordinates to projected CRS
+cities_proj <- cities %>%
+  sf::st_as_sf(coords = c("lon", "lat"), crs = 2157) %>% 
+  sf::st_transform(crs_itransm) %>% 
+  sf::st_coordinates() %>%
+  as.data.frame() %>%
+  mutate(name = cities$name) 
+
+# Plot using the new projection
+map1 <- ggplot2::ggplot() +
+  geom_sf(data = ireland_proj, fill = "lightgreen", color = "darkblue") +
+# County shapes
+  geom_sf(data = counties_proj, fill = NA, color = "red", size = 0.5) +
+# Cities
+  geom_point(data = cities_proj, aes(x = X, y = Y), color = "red", size = 3) +
+  geom_text(data = cities_proj, aes(x = X, y = Y, label = name), vjust = -1) +
+  
+  # Add a curved line from Dublin to Galway
+  geom_curve(aes(x = -6.2603, y = 53.3498, xend = -9.0568, yend = 53.2707),
+             curvature = 0.2, color = "purple", linewidth = 1, 
+             arrow = arrow(length = unit(0.15, "inches"))) +
+# Scale bar and compas
+  annotation_scale(location = "bl", width_hint = 0.5, unit_category = "metric", 
+                   bar_cols = c("darkblue", "white")) +
+  annotation_north_arrow(location = "tl", which_north = "true", 
+                         style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Map of Ireland (ITM Projection)")
+
+# Add income levels
+map2 <- ggplot2::ggplot() +
+  geom_sf(data = ireland_proj, fill = "lightgreen", color = "darkblue") +
+# County shapes
+  geom_sf(data = counties_proj, fill = NA, color = "red", size = 0.5) +
+# Median income
+  geom_sf(data = counties_income_proj, aes(fill = mdn_income), color = "gold") +
+  scale_fill_viridis_c(name = "Median Income (€)", na.value = "grey50") + 
+# Cities
+  geom_point(data = cities_proj, aes(x = X, y = Y), color = "red", size = 3) +
+  geom_text(data = cities_proj, aes(x = X, y = Y, label = name), vjust = -1) +
+  
+  # Add a curved line from Dublin to Galway
+  geom_curve(aes(x = -6.2603, y = 53.3498, xend = -9.0568, yend = 53.2707),
+             curvature = 0.2, color = "purple", linewidth = 1, 
+             arrow = arrow(length = unit(0.15, "inches"))) +
+# Scale bar and compas
+  annotation_scale(location = "bl", width_hint = 0.5, unit_category = "metric", 
+                   bar_cols = c("darkblue", "white")) +
+  annotation_north_arrow(location = "tl", which_north = "true", 
+                         style = north_arrow_fancy_orienteering) +
+  theme_minimal() +
+  ggtitle("Median Income by County in Ireland (ITM Projection)")
+
+map1
+# Save as PNG
+ggsave("ireland_map.png", plot = map1, width = 10, height = 8, dpi = 300)
+# Save as PNG
+ggsave("ireland_income_map.png", plot = map2, width = 10, height = 8, dpi = 300)
+```
+
+# Interactive Layers
+## County Shapes + Cities + Income
+```{r cci, message=FALSE, warning=FALSE}
+
+# Create a color palette function
+pal <- leaflet::colorNumeric(palette = "viridis", domain = counties_income$mdn_income)
+
+# Convert cities to sf
+cities_sf <- sf::st_as_sf(cities, coords = c("lon", "lat"), crs = 4326)
+
+# Leaflet map with toggleable layers
+leaflet::leaflet() %>%
+  leaflet::addProviderTiles("CartoDB.Positron") %>%
+  
+  # County boundaries
+  leaflet::addPolygons(
+    data = countyshapes,
+    color = "gold", weight = 1, fill = FALSE,
+    group = "County Boundaries"
+  ) %>%
+  
+  # Income overlay
+  leaflet::addPolygons(
+    data = counties_income,
+    fillColor = ~pal(mdn_income),
+    fillOpacity = 0.7,
+    color = "darkblue",
+    weight = 1,
+    popup = ~paste(NAME_1, "<br>Median Income: €", mdn_income),
+    group = "Median Income"
+  ) %>%
+  
+  # Cities layer
+  leaflet::addCircleMarkers(
+    data = cities_sf,
+    radius = 5,
+    color = "red",
+    label = ~name,
+    group = "Cities"
+  ) %>%
+  
+  # Legend
+  leaflet::addLegend(
+    pal = pal, values = counties_income$mdn_income,
+    title = "Median Income (€)", opacity = 1
+  ) %>%
+  
+  # Layers control
+  leaflet::addLayersControl(
+    overlayGroups = c("County Boundaries", "Median Income", "Cities"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+```
+## County Shapes + Cities + Income + Route
+```{r all, message=FALSE, warning=FALSE}
+
+# Define coordinates for Dublin and Galway
+dublin <- c(-6.2603, 53.3498)
+galway <- c(-9.0568, 53.2707)
+
+# Create a great-circle intermediate line (curved line simulation)
+route_line <- geosphere::gcIntermediate(dublin, galway, n = 100, addStartEnd = TRUE, sp = TRUE)
+
+# Convert to sf object
+route_sf <- sf::st_as_sf(route_line)
+
+# Extend your existing leaflet map
+leaflet::leaflet() %>%
+  leaflet::addProviderTiles("CartoDB.Positron") %>%
+  
+  # County boundaries
+  leaflet::addPolygons(
+    data = countyshapes,
+    color = "gold", weight = 1, fill = FALSE,
+    group = "County Boundaries"
+  ) %>%
+  
+  # Income overlay
+  leaflet::addPolygons(
+    data = counties_income,
+    fillColor = ~pal(mdn_income),
+    fillOpacity = 0.7,
+    color = "darkblue",
+    weight = 1,
+    popup = ~paste(NAME_1, "<br>Median Income: €", mdn_income),
+    group = "Median Income"
+  ) %>%
+  
+  # Cities layer
+  leaflet::addCircleMarkers(
+    data = cities_sf,
+    radius = 5,
+    color = "red",
+    label = ~name,
+    group = "Cities"
+  ) %>%
+  
+  # Route layer
+  leaflet::addPolylines(
+    data = route_sf,
+    color = "purple",
+    weight = 2,
+    opacity = 0.8,
+    group = "Route: Dublin to Galway"
+  ) %>%
+  
+  # Legend
+  leaflet::addLegend(
+    pal = pal, values = counties_income$mdn_income,
+    title = "Median Income (€)", opacity = 1
+  ) %>%
+  
+  # Layers control
+  leaflet::addLayersControl(
+    overlayGroups = c("County Boundaries", "Median Income", "Cities", "Route: Dublin to Galway"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+```
+
+
+# Animation
+```{r animate}
+img1 <- magick::image_read("ireland_map.png")
+img2 <- magick::image_read("ireland_income_map.png")
+
+# Create an animated dissolve
+magick::image_animate(magick::image_morph(c(img1, img2)),delay=20)
+
+```

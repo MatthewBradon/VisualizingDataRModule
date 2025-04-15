@@ -1,0 +1,532 @@
+---
+title: "L11-Visualizing Text"
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc_float: true
+    toc-location: left
+editor: source
+---
+
+
+This document demonstrates text visualization approaches.
+
+```{r setup}
+# Set the CRAN repository
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+quiet_library("tidyverse")        # Core packages for data wrangling, visualization (includes dplyr, ggplot2, etc.)
+
+quiet_library("tidytext")         # Text mining using tidy principles; unnest_tokens(), sentiment analysis, TF-IDF
+
+quiet_library("tm")               # Traditional text mining tools for corpus cleaning (e.g., removePunctuation(), stopwords)
+
+quiet_library("text2vec")         # High-performance text vectorization (word embeddings, TF-IDF, GloVe, etc.)
+
+quiet_library("tokenizers")       # Fast and flexible tokenization (words, sentences, ngrams, etc.)
+
+quiet_library("Rtsne")            # t-SNE algorithm for dimensionality reduction (e.g., 2D projections of word vectors)
+
+quiet_library("igraph")           # Graph and network analysis (used for word co-occurrence networks, semantic graphs)
+
+quiet_library("ggraph")           # Visualization of graphs and networks (works with igraph; great for word trees and clusters)
+
+quiet_library("ggplot2")          # Grammar of graphics plotting system (used to visualize frequency, sentiment, etc.)
+
+quiet_library("widyr")            # Pairwise correlations and distances between words (e.g., word co-occurrence)
+
+quiet_library("SnowballC")        # Stemming (reducing words to root form, e.g., "running" → "run")
+
+quiet_library("wordcloud")        # Generates word cloud visualizations based on term frequency
+
+quiet_library("RColorBrewer")     # Provides color palettes for use in plots (especially useful in wordclouds and ggplot2)
+
+quiet_library("pdftools")         # Reads text content from PDF files
+
+
+quiet_library("collapsibleTree")  # Creates interactive, collapsible D3-style trees (e.g., for word trees, suffix trees)
+
+# Text data to use
+text_data <- c(
+  "Data Science is fun and useful.",
+  "Machine learning is challenging."
+)
+```
+
+
+# Ngrams
+## Bigrams
+```{r ngram}
+# Extract bigrams (n = 2)
+bigrams <- tokenizers::tokenize_ngrams(text_data, n = 2)
+print(bigrams)
+
+# Using tidytext
+df <- tibble::tibble(text = text_data)
+
+bigrams_df <- df %>%
+  tidytext::unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+print(bigrams_df)
+
+```
+## Trigrams
+```{r tgram, message=FALSE, warning=FALSE}
+# Extract trigrams (n = 3)
+trigrams <- tokenizers::tokenize_ngrams(text_data, n = 3)
+print(trigrams)
+
+trigrams_df <- df %>%
+  tidytext::unnest_tokens(trigram, text, token = "ngrams", n = 3)
+
+print(trigrams_df)
+
+```
+
+# Bag of Words
+```{r bow, message=FALSE, warning=FALSE}
+text_data <- c(
+  "Data Science is fun and useful.",
+  "Machine learning is challenging."
+)
+
+# Create a corpus object using the 'tm' package
+corpus <- tm::Corpus(tm::VectorSource(text_data))
+
+# Preprocess the corpus using 'tm' functions
+corpus <- tm::tm_map(corpus, tm::content_transformer(tolower))
+corpus <- tm::tm_map(corpus, tm::removePunctuation)
+corpus <- tm::tm_map(corpus, tm::removeWords, tm::stopwords("en"))
+corpus <- tm::tm_map(corpus, tm::stripWhitespace)
+
+# Create a Document-Term Matrix (DTM)
+dtm <- tm::DocumentTermMatrix(corpus)
+
+# Convert DTM to a matrix
+bow_matrix <- as.matrix(dtm)
+
+# Convert to a data frame and print
+bow_df <- as.data.frame(bow_matrix)
+print(bow_df)
+
+```
+
+# TD-IDF
+```{r tdidf, message=FALSE, warning=FALSE}
+# Create a corpus
+corpus <- tm::Corpus(tm::VectorSource(text_data))
+
+# Preprocess: lowercase, remove punctuation and stopwords, strip whitespace
+corpus <- tm::tm_map(corpus, tm::content_transformer(tolower))
+corpus <- tm::tm_map(corpus, tm::removePunctuation)
+corpus <- tm::tm_map(corpus, tm::removeWords, tm::stopwords("en"))
+corpus <- tm::tm_map(corpus, tm::stripWhitespace)
+
+# Create Document-Term Matrix
+dtm <- tm::DocumentTermMatrix(corpus)
+
+# Convert to TF-IDF
+dtm_tfidf <- tm::weightTfIdf(dtm)
+
+# Convert to a matrix and print
+tfidf_matrix <- as.matrix(dtm_tfidf)
+
+
+print(tfidf_matrix)
+```
+
+# Stop Word Removal
+## Stop Word List
+```{r sw1, message=FALSE, warning=FALSE}
+# Using 'tm' for preprocessing
+corpus <- tm::Corpus(tm::VectorSource(text_data))
+
+# Convert to lowercase, remove punctuation, and stop words
+corpus <- tm::tm_map(corpus, tm::content_transformer(tolower))
+corpus <- tm::tm_map(corpus, tm::removePunctuation)
+corpus <- tm::tm_map(corpus, tm::removeWords, tm::stopwords("en"))  # Common English Stop Words
+corpus <- tm::tm_map(corpus, tm::stripWhitespace)
+
+# Inspect cleaned text
+tm::inspect(corpus)
+
+# tidytext approach
+df <- tibble::tibble(text = text_data)
+
+# Tokenize and Remove Stop Words using tidytext
+cleaned_df <- df %>%
+  tidytext::unnest_tokens(word, text) %>%
+  dplyr::anti_join(tidytext::stop_words, by = "word")
+
+print(cleaned_df)
+```
+
+## Using Tokenizers
+```{r sw2, message=FALSE, warning=FALSE}
+# Tokenize using the 'tokenizers' package
+tokens <- tokenizers::tokenize_words(text_data)
+
+# Remove stop words manually using the 'tm' package
+filtered_tokens <- lapply(tokens, function(words) {
+  words[!words %in% tm::stopwords("en")]
+})
+
+print(filtered_tokens)
+
+# Repeat (if needed)
+tokens <- tokenizers::tokenize_words(text_data)
+
+filtered_tokens <- lapply(tokens, function(words) {
+  words[!words %in% tm::stopwords("en")]
+})
+
+
+print(filtered_tokens)
+```
+
+
+# Word Embedding - Semantic Similarity
+## Table
+```{r word2vec, message=FALSE, warning=FALSE}
+# Tokenize - break text_data into individual words
+tokens_iterator <- text2vec::itoken(text_data, tokenizer = text2vec::word_tokenizer)
+
+# Create the vocabulary and vectorizer - builds a list of unique terms
+vocab <- text2vec::create_vocabulary(tokens_iterator) %>%
+  text2vec::prune_vocabulary(term_count_min = 1)
+vectorizer <- text2vec::vocab_vectorizer(vocab)
+
+# Create the term co-occurrence matrix (TCM)
+# Shows how frequently terms appear close to each other
+tcm <- text2vec::create_tcm(tokens_iterator, vectorizer, skip_grams_window = 3)
+
+# Create and train the GloVe model
+# Learns word embeddings: dense vector representations of words that capture semantic meaning
+glove_model <- text2vec::GloVe$new(rank = 50, x_max = 10)  # Create the model
+word_vectors <- glove_model$fit_transform(tcm, n_iter = 10)  # Fit and transform
+
+print(word_vectors)
+```
+*Table: Each row represents a word, and each column corresponds to a dimension in the 50-dimensional semantic space.
+
+## Visualization - Show how words cluster based on meaning
+```{r cluster, , message=FALSE, warning=FALSE}
+# Run t-SNE to reduce 50-dimensional word vectors to 2D for visualization.
+# Perplexity is set to 2 to ensure it's suitable for the small number of words (must be < n/3) where n is the number of rows in word_vectors.
+# Run t-SNE to reduce word vectors to 2D
+tsne_model <- Rtsne::Rtsne(word_vectors, dims = 2, perplexity = 2)
+
+# Plot the result
+graphics::plot(tsne_model$Y, type = "n")
+graphics::text(tsne_model$Y, labels = rownames(word_vectors), cex = 0.7)
+
+```
+# Semantic Network
+```{r semnet, message=FALSE, warning=FALSE}
+# Turn into a tibble
+text_df <- tibble::tibble(doc_id = 1:length(text_data), text = text_data)
+
+# Tokenize and clean
+tokens <- text_df %>%
+  tidytext::unnest_tokens(word, text) %>%
+  dplyr::filter(!word %in% tidytext::stop_words$word)  # remove stopwords
+
+# Create word pairs (bigrams within each doc)
+word_pairs <- tokens %>%
+  widyr::pairwise_count(word, doc_id, sort = TRUE, upper = FALSE)
+
+# Build graph
+graph <- igraph::graph_from_data_frame(word_pairs)
+
+# Visualize
+ggraph::ggraph(graph, layout = "fr") +  # fr = force-directed layout
+  ggraph::geom_edge_link(ggplot2::aes(edge_alpha = n), show.legend = FALSE) +
+  ggraph::geom_node_point(color = "steelblue", size = 5) +
+  ggraph::geom_node_text(ggplot2::aes(label = name), repel = TRUE) +
+  ggplot2::theme_minimal() +
+  ggplot2::labs(title = "Semantic Network of Word Co-occurrences")
+
+```
+
+# Stemming
+```{r stem, message=FALSE, warning=FALSE}
+# Sample text data
+text_data <- c(
+  "Natural language processing is fascinating.",
+  "Text mining involves many preprocessing steps.",
+  "Tokenization and stemming help analyze text."
+)
+
+# Create a data frame
+text_df <- tibble::tibble(line = 1:3, text = text_data)
+
+# Tokenize
+tokens <- text_df %>%
+  tidytext::unnest_tokens(word, text)
+
+# Remove stopwords
+data(tidytext::stop_words)  # built-in list of stopwords
+tokens_clean <- tokens %>%
+  dplyr::filter(!word %in% tidytext::stop_words$word)
+
+# Apply stemming (SnowballC)
+tokens_clean <- tokens_clean %>%
+  dplyr::mutate(stem = SnowballC::wordStem(word))
+
+# Count word frequency
+word_counts <- tokens_clean %>%
+  dplyr::count(stem, sort = TRUE)
+
+# View top words
+print(word_counts)
+
+# Visualize top stems
+word_counts %>%
+  dplyr::top_n(10) %>%
+  ggplot2::ggplot(ggplot2::aes(x = stats::reorder(stem, n), y = n)) +
+  ggplot2::geom_col(fill = "steelblue") +
+  ggplot2::coord_flip() +
+  ggplot2::labs(title = "Most Common Word Stems",
+                x = "Stemmed Word", y = "Frequency") +
+  ggplot2::theme_minimal()
+
+```
+
+# Word Cloud
+```{r wcloud, message=FALSE, warning=FALSE}
+# Step 1: Read text from the PDF
+pdf_text_data <- pdftools::pdf_text("C://datasets//VisualizingDataModuleSpec.pdf")
+
+# Step 2: Combine pages into one text blob
+full_text <- paste(pdf_text_data, collapse = " ")
+
+# Step 3: Create a text corpus
+corpus <- tm::Corpus(tm::VectorSource(full_text))
+
+# Step 4: Preprocess the text
+corpus <- tm::tm_map(corpus, tm::content_transformer(tolower))         # Lowercase
+corpus <- tm::tm_map(corpus, tm::removePunctuation)                    # Remove punctuation
+corpus <- tm::tm_map(corpus, tm::removeNumbers)                        # Remove numbers
+corpus <- tm::tm_map(corpus, tm::removeWords, tm::stopwords("en"))    # Remove English stopwords
+corpus <- tm::tm_map(corpus, tm::stripWhitespace)                      # Remove extra whitespace
+
+# Step 5: Create a term-document matrix
+tdm <- tm::TermDocumentMatrix(corpus)
+matrix <- as.matrix(tdm)
+
+# Step 6: Calculate word frequencies
+word_freqs <- sort(rowSums(matrix), decreasing = TRUE)
+word_df <- data.frame(word = names(word_freqs), freq = word_freqs)
+
+# Step 7: Generate the word cloud
+set.seed(123)
+wordcloud::wordcloud(
+  words = word_df$word,
+  freq = word_df$freq,
+  min.freq = 2,
+  max.words = 100,
+  random.order = FALSE,
+  colors = RColorBrewer::brewer.pal(8, "Dark2")
+)
+
+
+```
+# Word Tree
+## Word Tree (approximation)
+```{r wtree, message=FALSE, warning=FALSE}
+# Convert to tibble and tokenize
+text_df <- tibble::tibble(text = full_text)
+
+tokens <- text_df %>%
+  tidytext::unnest_tokens(word, text, token = "words")
+
+# Create word pairs (bigrams)
+bigrams <- text_df %>%
+  tidytext::unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+  tidyr::separate(bigram, into = c("word1", "word2"), sep = " ") %>%
+  dplyr::filter(!is.na(word2))
+
+# Optional: filter to root word (e.g., build branches from "data")
+root_word <- "data"
+branches <- bigrams %>%
+  dplyr::filter(word1 == root_word)
+
+# Create graph object
+graph <- igraph::graph_from_data_frame(branches)
+
+# Visualize as a tree (word tree approximation)
+ggraph::ggraph(graph, layout = "tree") +
+  ggraph::geom_edge_link() +
+  ggraph::geom_node_point(color = "steelblue", size = 3) +
+  ggraph::geom_node_text(ggplot2::aes(label = name), vjust = -0.5, hjust = 0.5) +
+  ggplot2::theme_void() +
+  ggplot2::labs(title = paste("Word Tree Rooted at:", root_word))
+
+```
+## Collapsible D3 Style Word Tree
+```{r D3, message=FALSE, warning=FALSE}
+
+# Sample data
+sample <- c(
+  "cats are better than dogs",
+  "cats eat kibble",
+  "cats are better than hamsters",
+  "cats are awesome",
+  "cats are people too",
+  "cats eat mice",
+  "cats meowing",
+  "cats in the cradle",
+  "cats eat mice",
+  "cats in the cradle lyrics",
+  "cats eat kibble",
+  "cats for adoption",
+  "cats are family",
+  "cats eat mice",
+  "cats are better than kittens",
+  "cats are evil",
+  "cats are weird",
+  "cats eat mice"
+)
+# Tokenize into individual words and build a data frame where each column is a level
+tokens_df <- tibble::tibble(sentence = sample) %>%
+  dplyr::mutate(id = dplyr::row_number()) %>%
+  tidyr::separate_rows(sentence, sep = " ") %>%
+  dplyr::filter(!sentence %in% tidytext::stop_words$word) %>% 
+  dplyr::group_by(id) %>%
+  dplyr::mutate(level = paste0("level_", dplyr::row_number())) %>%
+  dplyr::ungroup() %>%
+  tidyr::pivot_wider(names_from = level, values_from = sentence)
+
+# View a few rows
+head(tokens_df)
+
+# Visualize as collapsible D3 tree
+collapsibleTree::collapsibleTree(
+  tokens_df,
+  hierarchy = names(tokens_df)[-1],  # exclude the ID column
+  root = "cat hierarchy",
+  width = 800,
+  height = 600,
+  fontSize = 16,
+  zoomable = TRUE
+)
+
+
+```
+
+
+# Differences in Documents
+
+## Word Cloud per document
+```{r wcdiff, message=FALSE, warning=FALSE}
+# Your custom stopwords
+custom_stopwords <- c("marks", "cmpu", "4091", "semester", "exam", "supplemental", "dt228", "dt211c", "dt282", "tu856", "tu857", "tu858" ,"cmpu4091", "question", "paper", "examination", "figure", "e.g", "questions", "summer", "honours", "degree", "computer", "science", "international", "data", "visualizing", "visualization", "explain", "describe", "example", "instructions", "duration", "can", "internal", "external", "examiners", "date", "percentage", "bsc", "dr", "ms", "mr", "may")
+
+# Combine with built-in stopwords
+all_stopwords <- c(stop_words$word, custom_stopwords)
+
+
+# Read PDF text (update the file paths if needed)
+pdf1 <- pdftools::pdf_text("C://datasets//Exam2023.pdf")
+pdf2 <- pdftools::pdf_text("C://datasets//Exam2024.pdf")
+pdf3 <- pdftools::pdf_text("C://datasets//ExamSupp2024.pdf")
+
+# Combine all pages into one string per document
+text_data <- list(
+  "Exam 2023" = paste(pdf1, collapse = " "),
+  "Exam 2024" = paste(pdf2, collapse = " "),
+  "Supplemental 2024" = paste(pdf3, collapse = " ")
+)
+
+# Convert to a corpus
+corpus <- tm::Corpus(tm::VectorSource(text_data))
+
+# Clean and preprocess
+corpus <- tm::tm_map(corpus, tm::content_transformer(tolower))                            # Lowercase
+corpus <- tm::tm_map(corpus, tm::removePunctuation)                                       # Remove punctuation
+corpus <- tm::tm_map(corpus, tm::removeNumbers)                                           # Remove numbers
+corpus <- tm::tm_map(corpus, tm::removeWords, c(tm::stopwords("en"), custom_stopwords))  # Remove stopwords
+corpus <- tm::tm_map(corpus, tm::stripWhitespace)                                         # Remove extra spaces
+
+# Set layout to show all three word clouds side by side
+graphics::par(mfrow = c(1, 3))  # 1 row, 3 columns
+
+# Loop through each document in the corpus and generate a word cloud
+for (i in 1:length(corpus)) {
+  # Create term-document matrix
+  tdm <- tm::TermDocumentMatrix(corpus[i])
+  m <- as.matrix(tdm)
+  word_freqs <- sort(rowSums(m), decreasing = TRUE)
+  
+  # Generate word cloud
+  wordcloud::wordcloud(
+    words = names(word_freqs),
+    freq = word_freqs,
+    min.freq = 2,
+    max.words = 100,
+    random.order = FALSE,
+    colors = RColorBrewer::brewer.pal(8, "Dark2")
+  )
+}
+
+
+```
+
+
+## Bar Chart of Word Frequency
+
+```{r bchart, message=FALSE, warning=FALSE}
+# Combine each PDF into a single string
+doc_data <- tibble::tibble(
+  doc_id = c("Exam 2023", "Exam 2024", "Supplemental 2024"),
+  text = c(
+    paste(pdf1, collapse = " "),
+    paste(pdf2, collapse = " "),
+    paste(pdf3, collapse = " ")
+  )
+)
+
+# Tokenize and clean data
+data_tokens <- doc_data %>%
+  tidytext::unnest_tokens(word, text) %>%
+  dplyr::filter(!word %in% all_stopwords) %>%
+  dplyr::filter(stringr::str_detect(word, "[a-z]"))  # optional: only alphabetic
+
+# Count words per document
+word_counts <- data_tokens %>%
+  dplyr::count(doc_id, word, sort = TRUE)
+
+# Get top 10 words per document
+top_words <- word_counts %>%
+  dplyr::group_by(doc_id) %>%
+  dplyr::slice_max(order_by = n, n = 10) %>%
+  dplyr::ungroup()
+
+# Plot the top words
+ggplot2::ggplot(top_words, ggplot2::aes(x = tidytext::reorder_within(word, n, doc_id), y = n, fill = doc_id)) +
+  ggplot2::geom_col(show.legend = FALSE) +
+  ggplot2::facet_wrap(~ doc_id, scales = "free_y") +
+  tidytext::scale_x_reordered() +
+  ggplot2::coord_flip() +
+  ggplot2::labs(
+    title = "Top 10 Most Frequent Words per Exam Document",
+    x = "Word",
+    y = "Frequency"
+  ) +
+  ggplot2::theme_minimal()
+
+
+```
+

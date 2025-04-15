@@ -1,0 +1,219 @@
+---
+title: "L10-Cartograms"
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc_float: true
+    toc-location: left
+editor: source
+---
+This document demonstrates how to visualize and explore spatial data in Ireland using cartograms — thematic maps that distort geometry to reflect a specific data variable. The dataset used includes median household income across Irish counties, which is transformed into a series of cartographic representations using R.
+
+The workflow includes:
+
+* Importing and transforming spatial boundary data for Irish counties
+
+* Cleaning and joining socioeconomic data (median income) from the CSO
+
+* Reprojecting all spatial data to the Irish Transverse Mercator system (EPSG:2157)
+
+* Visualizing income variation through different types of cartograms
+
+Three types of cartograms are created to highlight different aspects of spatial distortion:
+
+* Non-contiguous cartogram: Counties are resized based on income but do not maintain adjacency.
+
+* Contiguous cartogram: Counties are distorted in shape and size while preserving connections between them.
+
+* Dorling cartogram: Counties are represented as non-overlapping circles sized proportionally to income.
+
+Each visualization is produced using the tmap package in plot mode, offering a clear and interpretable visual comparison of regional income distribution. 
+
+```{r setup}
+# Function to quietly install and load packages
+quiet_library <- function(pkg) {
+  suppressMessages(suppressWarnings({
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      install.packages(pkg, quiet = TRUE) # Install without messages
+    }
+    library(pkg, character.only = TRUE) # Load silently
+  }))
+}
+
+quiet_library("sf")               # For handling spatial data
+quiet_library("geojsonio")        # For reading geo json data
+quiet_library("cartogram")        # For creating cartograms
+quiet_library("rnaturalearth")    # Provides world map data
+quiet_library("rnaturalearthdata")
+quiet_library("tmap")             # Mapping package - like ggplot but for maps
+quiet_library("rmapshaper")        # Used to simplify shapes for contiguous cartogram
+quiet_library("tidyverse")
+
+mydata <- file.path("C:","Datasets")
+```
+
+```{r basemap}
+# setup the data for Ireland
+ireland <- rnaturalearth::ne_countries(scale = "medium", country = "Ireland", returnclass = "sf")
+
+# Setup dataframe with longitude and latitude of major cities
+cities <- data.frame(
+  name = c("Dublin", "Cork", "Limerick", "Galway"),
+  lon = c(-6.2603, -8.472, -8.6305, -9.0568),
+  lat = c(53.3498, 51.8985, 52.6680, 53.2707)
+)
+
+# Using the shape data downloaded from 
+# Replace this with your actual file path
+json_file <- file.path(mydata, "gadm41_IRL_1.json")
+                       
+# Read the GeoJSON file into an sf object
+countyshapes <- sf::st_read(json_file)
+
+# Replace NAME_1 with "Cork" where VARNAME_1 is "Corcaigh"
+# For some reason some Cork data is NA for NAME_1 but has the Irish equivalen
+countyshapes$NAME_1[countyshapes$VARNAME_1 == "Corcaigh"] <- "Cork"
+
+# Read in a file from CSO data of median income per electoral region
+incomeloc <-file.path(mydata,"MedianIncomeIreland.csv" )
+countyincome <-read.csv(incomeloc) 
+
+# Using a regular expression, extract county name after "Co." or Ending with Dublin, Cork City or Tipperary and add to the same dataset as column county
+countyincome$county <- str_extract(countyincome$Electoral.Division, 
+                                      "(?<=Co\\. )\\w+|Dublin$|Cork City$|Tipperary$")
+
+# Regular Expression explanation:
+# (?<=Co\. )\w+ - This is a lookbehind (?<=...), which ensures that the match only occurs if it is preceded by "Co. " (e.g., "Co. Mayo").
+# \w+ matches one or more word characters (letters, numbers, or underscores), so it captures county names like "Mayo", "Galway", etc., after "Co. ".
+# The | means OR.
+# Dublin$ matches "Dublin" only if it appears at the end of the string ($ means end of the string).
+# Cork City$ Matches "Cork City" only if it appears at the end of the string.
+#  Tipperary$ Matches "Tipperary" only if it appears at the end of the string.
+
+# Replace Cork City by Cork
+countyincome <- countyincome %>%
+  mutate(county = case_when(
+    county == "Cork City" ~ "Cork",
+    TRUE ~ county
+  ))
+# Rename column "VALUE" to "avg_income"
+countyincome <- countyincome %>%
+  rename(mdn_income = VALUE)
+countyincome <- na.omit(countyincome)
+
+# Summarize avg_income by county_name, omitting nas
+summary_df <- na.omit(countyincome) %>%
+  group_by(county) %>%
+  summarize(mdn_income = median(mdn_income, na.rm = TRUE))
+
+
+# Merge income data with spatial county boundaries
+counties_income <- countyshapes %>%
+  inner_join(summary_df, by = c("NAME_1" = "county")) %>% # Ensure column names match
+  st_as_sf()  # Ensure it remains a spatial object with geometry
+
+
+# Define a new projection (Irish Traverse Mercator)
+crs_itransm <- 2157
+
+# Reproject all spatial data
+ireland_proj <- sf::st_transform(ireland, crs_itransm)
+counties_proj <- sf::st_transform(countyshapes, crs_itransm)
+counties_income_proj <- sf::st_transform(counties_income, crs_itransm)
+
+# Convert city coordinates to projected CRS
+cities_proj <- cities %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 2157) %>% 
+  st_transform(crs_itransm) %>% 
+  st_coordinates() %>%
+  as.data.frame() %>%
+  mutate(name = cities$name) 
+
+
+```
+
+# Cartograms
+# Non-contiguous Cartogram
+```{r noncontcartogram, message=FALSE,warning=FALSE}
+# Ensure projected CRS 
+counties_income_proj <- sf::st_transform(counties_income, 2157)  # EPSG:2157 for Ireland
+
+# Create a non-contiguous cartogram
+counties_ncont <- cartogram::cartogram_ncont(counties_income_proj, "mdn_income")
+
+# Plot using tmap v4
+tmap::tmap_mode("plot")
+
+tmap::tm_shape(counties_ncont) +
+  tm_polygons(
+    fill = "mdn_income",
+    fill.scale = tm_scale_intervals(values = "brewer.yl_or_rd", style = "jenks"),
+    fill.legend = tm_legend(title = "Median Income (€)"),
+    col = "black"
+  ) +
+  tm_scalebar(position = c("left", "bottom")) +
+  tm_compass(type = "8star", size = 2, position = c("left", "top")) +
+  tm_title("Non-Contiguous Cartogram of Median Income by County in Ireland")
+
+
+
+```
+
+# Contiguous Cartogram
+```{r contig, message=FALSE,warning=FALSE}
+# Simplify geometries before creating the cartogram
+county_income_simplified <- rmapshaper::ms_simplify(counties_income_proj, keep = 0.05)  # keep 5% of points
+
+
+# Then generate the cartogram
+counties_cont <- cartogram::cartogram_cont(county_income_simplified, weight = "mdn_income", itermax = 5)
+
+
+# Plot using tmap v4
+tmap::tmap_mode("plot")
+# Set autoscale globally
+tmap::tmap_options(component.autoscale = TRUE)
+
+tmap::tm_shape(counties_cont) +
+  tm_polygons(
+    fill = "mdn_income",
+    fill.scale = tm_scale_intervals(values = "brewer.yl_or_rd", style = "jenks"),
+    fill.legend = tm_legend(title = "Median Income (€)"),
+    col = "black"
+  ) +
+  tm_scalebar(position = c("left", "bottom")) +
+  tm_compass(type = "8star", size = 2, position = c("left", "top")) +
+  tm_title("Contiguous Cartogram of Median Income by County in Ireland")
+
+
+
+```
+
+
+# Dorling Cartogram
+```{r dorlingcartogram, message=FALSE,warning=FALSE}
+
+
+# Reproject your spatial data first
+counties_income_proj <- sf::st_transform(counties_income, 3112)
+
+# Now create the Dorling cartogram
+county_cartogram_dorling <- cartogram::cartogram_dorling(counties_income_proj, "mdn_income", k = 1)
+
+# Set tmap to plot mode
+tmap::tmap_mode("plot")
+
+# Plot the Dorling cartogram
+tmap::tm_shape(county_cartogram_dorling) +
+  tm_polygons(
+    fill = "mdn_income",
+    fill.scale = tm_scale_intervals(values = "brewer.greens", style = "jenks"),
+    fill.legend = tm_legend(title = "Median Income (€)"),
+    col = "black"
+  ) +
+  tm_scalebar(position = c("left", "bottom")) +
+  tm_compass(type = "8star", size = 2, position = c("left", "top")) +
+  tm_title("Dorling Cartogram of Median Income by County in Ireland")
+```
