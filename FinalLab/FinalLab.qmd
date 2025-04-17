@@ -252,8 +252,6 @@ leaflet_map
 ```
 
 
-
-
 ```{r}
 sample_proclamation <- c(
   "we declare the right of the people of ireland",
@@ -268,103 +266,98 @@ sample_proclamation <- c(
   "we honour the sacrifice of those who came before us"
 )
 
-proclamation_df <- tibble(line = 1:10, text = sample_proclamation)
+# Convert to tibble
+proclamation_df <- tibble::tibble(line = 1:10, text = sample_proclamation)
 ```
 
-## Step 1: N-Grams (Bigrams & Trigrams)
-
-```{r ngrams}
+```{r}
+data("stop_words")
 
 # Bigrams
 bigrams <- proclamation_df %>%
-  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+  tidytext::unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+  tidyr::separate(bigram, c("word1", "word2"), sep = " ") %>%
+  dplyr::filter(!word1 %in% stop_words$word,
+                !word2 %in% stop_words$word) %>%
+  tidyr::unite(bigram, word1, word2, sep = " ") %>%
+  count(bigram, sort = TRUE)
 
 # Trigrams
 trigrams <- proclamation_df %>%
-  unnest_tokens(trigram, text, token = "ngrams", n = 3)
+  tidytext::unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
+  tidyr::separate(trigram, c("word1", "word2", "word3"), sep = " ") %>%
+  dplyr::filter(!word1 %in% stop_words$word,
+                !word2 %in% stop_words$word,
+                !word3 %in% stop_words$word) %>%
+  tidyr::unite(trigram, word1, word2, word3, sep = " ") %>%
+  count(trigram, sort = TRUE)
 
-# Separate & remove stop words
+# View
+bigrams
+trigrams
 
-data("stop_words")
-
-bigrams_separated <- bigrams %>%
-  separate(bigram, into = c("word1", "word2"), sep = " ") %>%
-  filter(!word1 %in% stop_words$word, !word2 %in% stop_words$word)
-
-trigrams_separated <- trigrams %>%
-  separate(trigram, into = c("word1", "word2", "word3"), sep = " ") %>%
-  filter(!word1 %in% stop_words$word,
-         !word2 %in% stop_words$word,
-         !word3 %in% stop_words$word)
-
-# View top bigrams
-bigrams_separated %>%
-  unite(bigram, word1, word2, sep = " ") %>%
-  count(bigram, sort = TRUE)
 ```
 
-## Step 2: Bag of Words
+```{r}
+bow <- proclamation_df %>%
+  tidytext::unnest_tokens(word, text) %>%
+  dplyr::anti_join(stop_words, by = "word") %>%
+  dplyr::count(word, sort = TRUE)
 
-```{r bow}
-words <- proclamation_df %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words, by = "word") %>%
-  count(word, sort = TRUE)
+bow
 
-words
+
 ```
-
-## Step 3: Word Cloud
-
-```{r wordcloud, fig.width=7, fig.height=5}
+```{r}
 set.seed(123)
-wordcloud(words = words$word,
-          freq = words$n,
-          min.freq = 1,
-          max.words = 100,
-          colors = brewer.pal(8, "Dark2"))
+wordcloud::wordcloud(
+  words = bow$word,
+  freq = bow$n,
+  min.freq = 1,
+  max.words = 100,
+  colors = RColorBrewer::brewer.pal(8, "Dark2")
+)
+
 ```
 
-## Step 4: Semantic Network (Co-occurrence)
-
-```{r semantic-network}
+```{r}
 co_occurrence <- proclamation_df %>%
-  unnest_tokens(word, text) %>%
-  anti_join(stop_words) %>%
+  tidytext::unnest_tokens(word, text) %>%
+  dplyr::anti_join(stop_words, by = "word") %>%
   pairwise_count(word, line, sort = TRUE, upper = FALSE)
 
-# Plot top co-occurring pairs
 co_occurrence %>%
   filter(n >= 2) %>%
-  graph_from_data_frame() %>%
-  ggraph(layout = "fr") +
-  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
-  geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), repel = TRUE) +
-  theme_void() +
-  ggtitle("Semantic Network: Co-occurring Words")
+  igraph::graph_from_data_frame() %>%
+  ggraph::ggraph(layout = "fr") +
+  ggraph::geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
+  ggraph::geom_node_point(color = "lightblue", size = 5) +
+  ggraph::geom_node_text(aes(label = name), repel = TRUE) +
+  ggplot2::theme_void() +
+  ggplot2::labs(title = "Semantic Network of Co-occurring Words")
+
 ```
 
-## Step 5: D3 Collapsible Word Tree
 
-```{r word-tree, results='asis'}
-# Tokenize proclamation sentences
-tokenized <- word_tokenizer(tolower(sample_proclamation))
-
-# Find maximum sentence length
+```{r}
+tokenized <- text2vec::word_tokenizer(tolower(sample_proclamation))
 max_len <- max(lengths(tokenized))
 
-# Pad and build data frame
-word_tree_data <- tokenized %>%
+tree_data <- tokenized %>%
   lapply(function(x) c(x, rep(NA, max_len - length(x)))) %>%
   do.call(rbind, .) %>%
   as.data.frame(stringsAsFactors = FALSE)
 
-# Set column names
-colnames(word_tree_data) <- paste0("word", 1:ncol(word_tree_data))
+colnames(tree_data) <- paste0("word", 1:ncol(tree_data))
 
-# Generate collapsible word tree from root "we"
-collapsibleTree(word_tree_data, hierarchy = colnames(word_tree_data), root = "we")
+collapsibleTree::collapsibleTree(
+  tree_data,
+  hierarchy = colnames(tree_data),
+  root = "we",
+  width = 800,
+  height = 600,
+  fontSize = 16,
+  zoomable = TRUE
+)
 
 ```
-
