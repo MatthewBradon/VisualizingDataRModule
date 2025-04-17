@@ -215,17 +215,26 @@ cartogram_map
 states_income_leaflet <- st_transform(states_income, crs = 4326)
 cities_sf_leaflet <- st_transform(cities_sf, crs = 4326)
 
-# Create base leaflet map
+# Extract lon/lat from city points
+cities_coords <- cities_sf_leaflet %>%
+  dplyr::mutate(
+    lon = sf::st_coordinates(.)[, 1],
+    lat = sf::st_coordinates(.)[, 2]
+  ) %>%
+  dplyr::select(name, lon, lat) %>%
+  as.data.frame()
+
+# Create leaflet map
 leaflet_map <- leaflet() %>%
   addTiles(group = "Base Map") %>%
 
-  # Add state boundaries
+  # State boundaries
   addPolygons(data = states_income_leaflet,
               color = "blue", weight = 1, fill = FALSE,
               label = ~NAME_1,
               group = "State Boundaries") %>%
 
-  # Add income-based fill choropleth
+  # Income choropleth
   addPolygons(data = states_income_leaflet,
               fillColor = ~colorNumeric("YlOrRd", mdn_income)(mdn_income),
               fillOpacity = 0.7, weight = 1, color = "#444444",
@@ -233,8 +242,10 @@ leaflet_map <- leaflet() %>%
               highlightOptions = highlightOptions(weight = 2, color = "black", bringToFront = TRUE),
               group = "Income Choropleth") %>%
 
-  # Add cities
-  addCircleMarkers(data = cities_sf_leaflet,
+  # Major cities with labels
+  addCircleMarkers(data = cities_coords,
+                   lng = ~lon,
+                   lat = ~lat,
                    radius = 5,
                    color = "red",
                    stroke = TRUE,
@@ -242,13 +253,14 @@ leaflet_map <- leaflet() %>%
                    label = ~name,
                    group = "Major Cities") %>%
 
-  # Add layer controls
+  # Controls
   addLayersControl(
     overlayGroups = c("State Boundaries", "Income Choropleth", "Major Cities"),
     options = layersControlOptions(collapsed = FALSE)
   )
 
 leaflet_map
+
 ```
 
 
@@ -305,8 +317,6 @@ bow <- proclamation_df %>%
   dplyr::count(word, sort = TRUE)
 
 bow
-
-
 ```
 ```{r}
 set.seed(123)
@@ -317,7 +327,6 @@ wordcloud::wordcloud(
   max.words = 100,
   colors = RColorBrewer::brewer.pal(8, "Dark2")
 )
-
 ```
 
 ```{r}
@@ -327,7 +336,7 @@ co_occurrence <- proclamation_df %>%
   pairwise_count(word, line, sort = TRUE, upper = FALSE)
 
 co_occurrence %>%
-  filter(n >= 2) %>%
+  # filter(n >= 1) %>%
   igraph::graph_from_data_frame() %>%
   ggraph::ggraph(layout = "fr") +
   ggraph::geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
@@ -335,15 +344,20 @@ co_occurrence %>%
   ggraph::geom_node_text(aes(label = name), repel = TRUE) +
   ggplot2::theme_void() +
   ggplot2::labs(title = "Semantic Network of Co-occurring Words")
-
 ```
 
 
 ```{r}
 tokenized <- text2vec::word_tokenizer(tolower(sample_proclamation))
-max_len <- max(lengths(tokenized))
 
-tree_data <- tokenized %>%
+# Remove stop words from each tokenized sentence
+tokenized_clean <- lapply(tokenized, function(words) {
+  words[!words %in% stop_words$word]
+})
+
+max_len <- max(lengths(tokenized_clean))
+
+tree_data <- tokenized_clean %>%
   lapply(function(x) c(x, rep(NA, max_len - length(x)))) %>%
   do.call(rbind, .) %>%
   as.data.frame(stringsAsFactors = FALSE)
@@ -353,7 +367,7 @@ colnames(tree_data) <- paste0("word", 1:ncol(tree_data))
 collapsibleTree::collapsibleTree(
   tree_data,
   hierarchy = colnames(tree_data),
-  root = "we",
+  root = "proclamation",
   width = 800,
   height = 600,
   fontSize = 16,
